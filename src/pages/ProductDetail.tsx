@@ -12,7 +12,11 @@ import { ProductMediaCarousel } from "@/components/ProductMediaCarousel";
 import { PricingTable } from "@/components/PricingTable";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { ReviewSection } from "@/components/ReviewSection";
-import { ExternalLink, Save, Star, BarChart, MessageSquare, FileText } from "lucide-react";
+import { ReviewModal } from "@/components/ReviewModal";
+import { ExternalLink, Save, Star, BarChart, MessageSquare } from "lucide-react";
+
+// Update the Media type for the product data to match the ProductMediaCarousel interface
+import { Media } from "@/components/ProductMediaCarousel";
 
 // Mock data for the product
 const productData = {
@@ -85,21 +89,21 @@ const productData = {
   ],
   media: [
     {
-      type: "image",
+      type: "image" as const,
       url: "https://via.placeholder.com/800x500",
       caption: "Dashboard View"
     },
     {
-      type: "image",
+      type: "image" as const,
       url: "https://via.placeholder.com/800x500",
       caption: "Integration Settings"
     },
     {
-      type: "video",
+      type: "video" as const,
       url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       caption: "Product Demo"
     }
-  ],
+  ] as Media[],
   reviews: [
     {
       id: "1",
@@ -139,7 +143,7 @@ const productData = {
       category: "Authentication",
       signalScore: 7.9,
       logo: "📊",
-      price: "Freemium",
+      price: "Freemium" as const,
       badges: ["Web3 SDK", "Multi-Chain"],
       description: "Web3 development platform with authentication capabilities."
     },
@@ -149,7 +153,7 @@ const productData = {
       category: "Authentication",
       signalScore: 8.1,
       logo: "🔗",
-      price: "$",
+      price: "$" as const,
       badges: ["Passwordless", "SDK"],
       description: "Passwordless authentication solution for Web3 applications."
     },
@@ -159,7 +163,7 @@ const productData = {
       category: "Authentication",
       signalScore: 8.7,
       logo: "👛",
-      price: "Free",
+      price: "Free" as const,
       badges: ["Open Source", "Wallet Integration"],
       description: "Open protocol for connecting wallets to dApps."
     }
@@ -181,6 +185,11 @@ export default function ProductDetail() {
 
   const handleSave = () => {
     setIsSaved(!isSaved);
+  };
+
+  const handleReviewSubmitted = () => {
+    // In a real app, you would refresh the reviews data here
+    console.log("Review submitted successfully");
   };
 
   return (
@@ -292,12 +301,21 @@ export default function ProductDetail() {
         {/* Main Content Tabs */}
         <div className="container mx-auto px-4 py-8">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="pricing">Pricing</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews</TabsTrigger>
-              <TabsTrigger value="alternatives">Alternatives</TabsTrigger>
-            </TabsList>
+            <div className="flex justify-between items-center mb-6">
+              <TabsList>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                <TabsTrigger value="alternatives">Alternatives</TabsTrigger>
+              </TabsList>
+              
+              {/* Review Button - Added here */}
+              <ReviewModal 
+                productId={product.id} 
+                productName={product.name}
+                onReviewSubmitted={handleReviewSubmitted}
+              />
+            </div>
             
             <TabsContent value="overview" className="space-y-8">
               {/* Media Carousel */}
