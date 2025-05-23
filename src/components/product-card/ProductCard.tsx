@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { StackCreationModal } from "@/components/stack/StackCreationModal";
 import { useStacks } from "@/hooks/useStacks";
@@ -19,11 +20,22 @@ export interface ProductCardProps {
     description: string;
   };
   className?: string;
+  onViewDetails?: () => void;
 }
 
-export function ProductCard({ product, className }: ProductCardProps) {
+export function ProductCard({ product, className, onViewDetails }: ProductCardProps) {
   const [stackModalOpen, setStackModalOpen] = useState(false);
   const { stacks, createStack, addProductToStack } = useStacks();
+  const navigate = useNavigate();
+
+  const handleViewDetails = () => {
+    if (onViewDetails) {
+      onViewDetails();
+    } else {
+      // Default behavior - navigate to the product detail page
+      navigate(`/product/${product.id}`);
+    }
+  };
 
   return (
     <div className={cn(
@@ -50,6 +62,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         <ProductCardFooter 
           price={product.price}
           onAddToStack={() => setStackModalOpen(true)}
+          onViewDetails={handleViewDetails}
         />
       </div>
 

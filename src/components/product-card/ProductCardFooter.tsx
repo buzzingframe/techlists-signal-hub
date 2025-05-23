@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 interface ProductCardFooterProps {
   price: "Free" | "$" | "$$" | "Freemium";
   onAddToStack: () => void;
+  onViewDetails?: () => void;
 }
 
-export function ProductCardFooter({ price, onAddToStack }: ProductCardFooterProps) {
+export function ProductCardFooter({ price, onAddToStack, onViewDetails }: ProductCardFooterProps) {
   const getPriceColor = (price: string) => {
     switch (price) {
       case "Free": return "text-green-600 bg-green-50 dark:bg-green-900/20";
@@ -41,6 +42,7 @@ export function ProductCardFooter({ price, onAddToStack }: ProductCardFooterProp
           variant="outline" 
           size="sm" 
           className="opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+          onClick={onViewDetails}
         >
           View Details
         </Button>

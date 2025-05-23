@@ -7,9 +7,11 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { NewsPreviewStrip } from "@/components/NewsPreviewStrip";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("trending");
+  const navigate = useNavigate();
 
   // Sample product data
   const products = [
@@ -88,6 +90,11 @@ const Index = () => {
       default:
         return products;
     }
+  };
+
+  // Function to navigate to product detail page
+  const handleViewProduct = (productId: string) => {
+    navigate(`/product/${productId}`);
   };
 
   return (
@@ -169,7 +176,11 @@ const Index = () => {
             <TabsContent value={activeTab} className="mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts().map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard 
+                    key={product.id} 
+                    product={product}
+                    onViewDetails={() => handleViewProduct(product.id)}
+                  />
                 ))}
               </div>
             </TabsContent>
