@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -34,6 +33,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import { reviewService } from "@/services/reviewService";
 
 // Define the review schema with Zod
 const reviewSchema = z.object({
@@ -86,25 +86,21 @@ export function ReviewModal({ productId, productName, onReviewSubmitted }: Revie
   // Handle form submission
   const onSubmit = async (data: ReviewFormValues) => {
     try {
-      // Here you would submit the review to Supabase
-      // const { error } = await supabase.from('reviews').insert({
-      //   product_id: productId,
-      //   score: data.score,
-      //   pros: data.pros,
-      //   cons: data.cons,
-      //   verdict: data.verdict,
-      //   reviewer_type: data.reviewerType,
-      //   pricing_feedback: data.pricingFeedback,
-      //   compared_product: data.comparedProduct,
-      //   status: 'needs_moderation' // or 'active' if auto-approved
-      // });
-      
-      // if (error) throw error;
+      await reviewService.submitReview({
+        productId,
+        score: data.score,
+        pros: data.pros,
+        cons: data.cons,
+        verdict: data.verdict,
+        reviewerType: data.reviewerType,
+        pricingFeedback: data.pricingFeedback,
+        comparedProduct: data.comparedProduct,
+      });
 
       // Success notification
       toast({
         title: "Review submitted!",
-        description: "Thank you for sharing your feedback.",
+        description: "Thank you for sharing your feedback. It will appear after moderation.",
       });
 
       // Close the modal and reset form
@@ -120,7 +116,7 @@ export function ReviewModal({ productId, productName, onReviewSubmitted }: Revie
       toast({
         variant: "destructive",
         title: "Submission failed",
-        description: "There was a problem submitting your review.",
+        description: error instanceof Error ? error.message : "There was a problem submitting your review.",
       });
     }
   };

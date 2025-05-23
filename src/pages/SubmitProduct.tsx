@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -34,7 +35,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Check, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { submissionService } from "@/services/submissionService";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -78,19 +80,27 @@ export default function SubmitProduct() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
-      setIsSubmitting(false);
+    try {
+      await submissionService.submitProduct(values);
+      
       setIsSubmitted(true);
       toast({
-        title: "Product submitted",
-        description: "Your product has been submitted for review.",
+        title: "Product submitted successfully",
+        description: "Your product has been submitted for review and will appear in the admin dashboard.",
       });
-    }, 1500);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        variant: "destructive",
+        title: "Submission failed",
+        description: error instanceof Error ? error.message : "There was a problem submitting your product.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (

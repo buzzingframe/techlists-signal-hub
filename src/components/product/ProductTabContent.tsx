@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReviewSection } from "@/components/ReviewSection";
@@ -45,7 +44,10 @@ export function ProductTabContent({ product, onReviewSubmitted }: ProductTabCont
         </TabsContent>
         
         <TabsContent value="reviews">
-          <ReviewSection reviews={product.reviews || []} />
+          <ReviewSection 
+            reviews={product.reviews || []} 
+            productId={product.id}
+          />
         </TabsContent>
         
         <TabsContent value="alternatives">
