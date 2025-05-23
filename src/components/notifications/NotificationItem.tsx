@@ -60,7 +60,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
-      onClick={() => notification.link && window.location.href = notification.link}
+      onClick={() => notification.link && (window.location.href = notification.link)}
     >
       <div className="flex-shrink-0 mt-1">
         {getIcon()}
