@@ -14,6 +14,18 @@ export interface Product {
   reviewerPersona?: string;
   features?: ProductFeature[];
   media?: Media[];
+  pricing?: Record<string, {
+    name: string;
+    price: string;
+    features: string[];
+  }>;
+  reviews?: any[]; // This could be replaced with a proper Review interface
+  alternatives?: Product[];
+  adminReview?: {
+    editor: string;
+    date: string;
+    quote: string;
+  };
 }
 
 export interface ProductFeature {
