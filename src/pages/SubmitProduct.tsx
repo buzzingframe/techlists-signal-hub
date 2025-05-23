@@ -2,70 +2,46 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Check, Loader2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { submissionService, ProductSubmission } from "@/services/submissionService";
+import { submissionService, SubmissionWithMedia } from "@/services/submissionService";
+import { Form } from "@/components/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { MultiStepForm } from "@/components/submission/MultiStepForm";
+import { BasicInfoStep } from "@/components/submission/steps/BasicInfoStep";
+import { MediaStep } from "@/components/submission/steps/MediaStep";
+import { FeaturesStep } from "@/components/submission/steps/FeaturesStep";
+import { ReviewStep } from "@/components/submission/steps/ReviewStep";
+import { ProductFeature } from "@/components/submission/FeatureBuilder";
 
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Product name must be at least 2 characters.",
-  }),
-  website: z.string().url({
-    message: "Please enter a valid URL.",
-  }),
-  category: z.string({
-    required_error: "Please select a category.",
-  }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }),
-  useCase: z.string().min(10, {
-    message: "Use case must be at least 10 characters.",
-  }),
+  name: z.string().min(2, "Product name must be at least 2 characters."),
+  website: z.string().url("Please enter a valid URL."),
+  category: z.string({ required_error: "Please select a category." }),
+  description: z.string().min(10, "Description must be at least 10 characters."),
+  useCase: z.string().min(10, "Use case must be at least 10 characters."),
   price: z.enum(["Free", "$", "$$", "Freemium"], {
     required_error: "Please select a pricing model.",
   }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
+  email: z.string().email("Please enter a valid email address."),
+  demoVideo: z.string().url().optional().or(z.literal("")),
+  githubUrl: z.string().url().optional().or(z.literal("")),
+  technicalDetails: z.string().optional(),
+  integrations: z.string().optional(),
 });
 
 export default function SubmitProduct() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [features, setFeatures] = useState<ProductFeature[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,17 +51,86 @@ export default function SubmitProduct() {
       category: "",
       description: "",
       useCase: "",
-      price: undefined,
       email: "",
+      demoVideo: "",
+      githubUrl: "",
+      technicalDetails: "",
+      integrations: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  // Check if each step can proceed
+  const canProceed = [
+    // Step 1: Basic info - all required fields filled
+    form.watch("name") && form.watch("website") && form.watch("category") && 
+    form.watch("description") && form.watch("useCase") && form.watch("price"),
+    
+    // Step 2: Media - no strict requirements, optional
+    true,
+    
+    // Step 3: Features - no strict requirements, optional  
+    true,
+    
+    // Step 4: Review - email is required
+    form.watch("email")
+  ];
+
+  const steps = [
+    {
+      title: "Basic Information",
+      component: <BasicInfoStep form={form} />
+    },
+    {
+      title: "Media & Branding", 
+      component: (
+        <MediaStep 
+          form={form}
+          logoFile={logoFile}
+          setLogoFile={setLogoFile}
+          mediaFiles={mediaFiles}
+          setMediaFiles={setMediaFiles}
+        />
+      )
+    },
+    {
+      title: "Features & Details",
+      component: (
+        <FeaturesStep 
+          form={form}
+          features={features}
+          setFeatures={setFeatures}
+        />
+      )
+    },
+    {
+      title: "Review & Submit",
+      component: (
+        <ReviewStep 
+          form={form}
+          logoFile={logoFile}
+          mediaFiles={mediaFiles}
+          features={features}
+        />
+      )
+    }
+  ];
+
+  async function onSubmit() {
+    if (!form.formState.isValid) {
+      toast({
+        variant: "destructive",
+        title: "Form validation failed",
+        description: "Please check all required fields.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      // Ensure all fields are defined as required by ProductSubmission
-      const submission: ProductSubmission = {
+      const values = form.getValues();
+      
+      const submission: SubmissionWithMedia = {
         name: values.name,
         website: values.website,
         category: values.category,
@@ -93,6 +138,13 @@ export default function SubmitProduct() {
         useCase: values.useCase,
         price: values.price,
         email: values.email,
+        demoVideo: values.demoVideo || undefined,
+        githubUrl: values.githubUrl || undefined,
+        technicalDetails: values.technicalDetails || undefined,
+        integrations: values.integrations || undefined,
+        logoFile: logoFile || undefined,
+        mediaFiles: mediaFiles.length > 0 ? mediaFiles : undefined,
+        features: features.length > 0 ? features : undefined,
       };
       
       await submissionService.submitProduct(submission);
@@ -114,19 +166,29 @@ export default function SubmitProduct() {
     }
   }
 
+  const resetForm = () => {
+    setIsSubmitted(false);
+    form.reset();
+    setLogoFile(null);
+    setMediaFiles([]);
+    setFeatures([]);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
       
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8 max-w-3xl">
-          <h1 className="text-3xl font-bold mb-2">Submit a Product</h1>
-          <p className="text-muted-foreground mb-8">
-            Help the community discover great tools by submitting a product
-          </p>
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2">Submit a Product</h1>
+            <p className="text-muted-foreground">
+              Help the community discover great tools by submitting a product
+            </p>
+          </div>
           
           {isSubmitted ? (
-            <Card>
+            <Card className="max-w-2xl mx-auto">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
@@ -148,7 +210,7 @@ export default function SubmitProduct() {
                 </Alert>
                 
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={() => setIsSubmitted(false)}>
+                  <Button variant="outline" onClick={resetForm}>
                     Submit Another
                   </Button>
                   <Button>View Your Submissions</Button>
@@ -156,165 +218,14 @@ export default function SubmitProduct() {
               </CardContent>
             </Card>
           ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Information</CardTitle>
-                <CardDescription>
-                  Please provide details about the product you're submitting
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Product Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. MetaMask" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="website"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Website</FormLabel>
-                            <FormControl>
-                              <Input placeholder="https://example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Category</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a category" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="wallet">Wallet</SelectItem>
-                                <SelectItem value="defi">DeFi</SelectItem>
-                                <SelectItem value="nft">NFT</SelectItem>
-                                <SelectItem value="dao">DAO</SelectItem>
-                                <SelectItem value="infrastructure">Infrastructure</SelectItem>
-                                <SelectItem value="development">Development</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Pricing Model</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select pricing" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="Free">Free</SelectItem>
-                                <SelectItem value="$">Paid ($)</SelectItem>
-                                <SelectItem value="$$">Premium ($$)</SelectItem>
-                                <SelectItem value="Freemium">Freemium</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Briefly describe what this product does" 
-                              className="min-h-[100px]"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="useCase"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Use Case</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="How and why would someone use this product?" 
-                              className="min-h-[100px]"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Your Email</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="email" 
-                              placeholder="email@example.com" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            We'll notify you when your submission is reviewed
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="flex justify-end">
-                      <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Submit Product
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+            <Form {...form}>
+              <MultiStepForm
+                steps={steps}
+                onSubmit={onSubmit}
+                isSubmitting={isSubmitting}
+                canProceed={canProceed}
+              />
+            </Form>
           )}
         </div>
       </main>

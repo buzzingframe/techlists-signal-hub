@@ -95,6 +95,7 @@ export type Database = {
           features: Json | null
           id: string
           logo: string | null
+          logo_url: string | null
           media: Json | null
           name: string
           price: string | null
@@ -117,6 +118,7 @@ export type Database = {
           features?: Json | null
           id?: string
           logo?: string | null
+          logo_url?: string | null
           media?: Json | null
           name: string
           price?: string | null
@@ -139,6 +141,7 @@ export type Database = {
           features?: Json | null
           id?: string
           logo?: string | null
+          logo_url?: string | null
           media?: Json | null
           name?: string
           price?: string | null
