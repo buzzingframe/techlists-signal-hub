@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger 
 } from "@/components/ui/sheet";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock notifications data - in a real app, this would come from an API or database
 const mockNotifications: Notification[] = [
@@ -70,7 +69,7 @@ const mockNotifications: Notification[] = [
 export function NotificationsDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [unreadCount, setUnreadCount] = useState(0);
-  const isMobile = useMediaQuery("(max-width: 640px)");
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     const count = notifications.filter(notification => !notification.read).length;
