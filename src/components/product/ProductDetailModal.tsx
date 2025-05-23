@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -18,12 +18,25 @@ export function ProductDetailModal() {
   const { isModalOpen, productData, closeProductModal } = useProductModal();
   const navigate = useNavigate();
   
-  // Use the same hook as the full product page to fetch complete data
-  const { product, handleReviewSubmitted } = useProductDetail(
+  // Use the productDetail hook to fetch complete data when the modal is open
+  const { product, isLoading, handleReviewSubmitted } = useProductDetail(
     productData?.id,
-    // Only fetch when modal is open and we have a product ID
     { enabled: isModalOpen && !!productData?.id }
   );
+  
+  // When loading, show a loading state
+  if (isLoading && isModalOpen) {
+    return (
+      <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeProductModal()}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Loading product details...</DialogTitle>
+            <DialogDescription>Please wait while we load the product information.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   
   // Use the complete product data if available, otherwise fall back to the basic data
   const displayProduct = product || productData;
@@ -49,7 +62,7 @@ export function ProductDetailModal() {
               <div className="text-3xl">{displayProduct.logo}</div>
               <div>
                 <DialogTitle className="text-xl font-semibold">{displayProduct.name}</DialogTitle>
-                <p className="text-muted-foreground">{displayProduct.category}</p>
+                <DialogDescription className="text-muted-foreground">{displayProduct.category}</DialogDescription>
               </div>
             </div>
             <Button 
@@ -68,58 +81,60 @@ export function ProductDetailModal() {
             <ProductMetaOverview product={displayProduct} />
           </div>
           
-          {/* Tabs */}
-          <div className="p-6">
-            <Tabs defaultValue="overview" className="w-full">
-              <div className="flex justify-between items-center mb-6">
-                <TabsList>
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="pricing">Pricing</TabsTrigger>
-                  <TabsTrigger value="reviews">Reviews</TabsTrigger>
-                  <TabsTrigger value="alternatives">Alternatives</TabsTrigger>
-                </TabsList>
-                
-                {/* Review Button */}
-                <ReviewModal 
-                  productId={displayProduct.id} 
-                  productName={displayProduct.name}
-                  onReviewSubmitted={handleReviewSubmitted}
-                />
-              </div>
-              
-              <TabsContent value="overview">
-                {displayProduct.features && displayProduct.media && (
-                  <ProductOverviewTab 
-                    features={displayProduct.features} 
-                    media={displayProduct.media} 
+          {/* Tabs - Only render if we have the complete product data */}
+          {product && (
+            <div className="p-6">
+              <Tabs defaultValue="overview" className="w-full">
+                <div className="flex justify-between items-center mb-6">
+                  <TabsList>
+                    <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                    <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                    <TabsTrigger value="alternatives">Alternatives</TabsTrigger>
+                  </TabsList>
+                  
+                  {/* Review Button */}
+                  <ReviewModal 
+                    productId={product.id} 
+                    productName={product.name}
+                    onReviewSubmitted={handleReviewSubmitted}
                   />
-                )}
-              </TabsContent>
-              
-              <TabsContent value="pricing">
-                {displayProduct.pricing && (
-                  <ProductPricingTab pricing={displayProduct.pricing} />
-                )}
-              </TabsContent>
-              
-              <TabsContent value="reviews">
-                {displayProduct.reviews && (
-                  <ReviewSection reviews={displayProduct.reviews} />
-                )}
-              </TabsContent>
-              
-              <TabsContent value="alternatives">
-                {displayProduct.alternatives && (
-                  <ProductAlternativesTab alternatives={displayProduct.alternatives} />
-                )}
-              </TabsContent>
-            </Tabs>
-          </div>
+                </div>
+                
+                <TabsContent value="overview">
+                  {product.features && product.media && (
+                    <ProductOverviewTab 
+                      features={product.features} 
+                      media={product.media} 
+                    />
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="pricing">
+                  {product.pricing && (
+                    <ProductPricingTab pricing={product.pricing} />
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="reviews">
+                  {product.reviews && (
+                    <ReviewSection reviews={product.reviews} />
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="alternatives">
+                  {product.alternatives && (
+                    <ProductAlternativesTab alternatives={product.alternatives} />
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
           
           {/* Admin Review */}
-          {displayProduct.adminReview && (
+          {product?.adminReview && (
             <div className="px-6 pb-6">
-              <ProductEditorialReview adminReview={displayProduct.adminReview} />
+              <ProductEditorialReview adminReview={product.adminReview} />
             </div>
           )}
         </div>
