@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Product } from "@/types/product";
 import { useProduct } from "@/hooks/useProducts";
 import { useSavedProducts } from "@/hooks/useSavedProducts";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,17 +11,28 @@ interface UseProductDetailOptions {
 export function useProductDetail(productId?: string, options?: UseProductDetailOptions) {
   const [user, setUser] = useState<any>(null);
   
-  // Get current user
+  // Get current user - memoize to prevent unnecessary re-renders
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    let mounted = true;
+    
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (mounted) {
+        setUser(user);
+      }
+    };
+    
+    getUser();
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Memoize the enabled state to prevent unnecessary re-renders
   const isEnabled = useMemo(() => 
-    options?.enabled !== undefined ? options.enabled : true, 
-    [options?.enabled]
+    options?.enabled !== undefined ? options.enabled : Boolean(productId), 
+    [options?.enabled, productId]
   );
   
   // Fetch product data
@@ -30,13 +40,16 @@ export function useProductDetail(productId?: string, options?: UseProductDetailO
   
   // Handle saved products
   const { isProductSaved, toggleSaveProduct, isSaving } = useSavedProducts(user?.id);
-  const isSaved = productId ? isProductSaved(productId) : false;
+  const isSaved = useMemo(() => 
+    productId ? isProductSaved(productId) : false, 
+    [productId, isProductSaved]
+  );
   
   // Memoize the handle save function
   const handleSave = useCallback(() => {
     if (productId && user) {
       toggleSaveProduct(productId);
-    } else {
+    } else if (!user) {
       console.log('Please log in to save products');
     }
   }, [productId, user, toggleSaveProduct]);
@@ -46,15 +59,15 @@ export function useProductDetail(productId?: string, options?: UseProductDetailO
     console.log("Review submitted successfully");
   }, []);
   
+  // Handle scroll to top for full page views
   useEffect(() => {
-    // Skip if not enabled or no productId
     if (!isEnabled || !productId) {
       return;
     }
     
-    // Scroll to top only on full page (not in modal)
-    if (!options?.enabled) {
-      window.scrollTo(0, 0);
+    // Only scroll to top if this is a full page view (not in modal)
+    if (options?.enabled === undefined) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [productId, isEnabled, options?.enabled]);
   
