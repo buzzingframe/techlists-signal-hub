@@ -91,6 +91,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           editorial_summary: string | null
+          email: string | null
           features: Json | null
           id: string
           logo: string | null
@@ -98,8 +99,10 @@ export type Database = {
           name: string
           price: string | null
           pricing: Json | null
+          rejection_reason: string | null
           reviewer_persona: string | null
           signal_score: number | null
+          status: string | null
           updated_at: string | null
           use_case: string[] | null
           website: string | null
@@ -110,6 +113,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           editorial_summary?: string | null
+          email?: string | null
           features?: Json | null
           id?: string
           logo?: string | null
@@ -117,8 +121,10 @@ export type Database = {
           name: string
           price?: string | null
           pricing?: Json | null
+          rejection_reason?: string | null
           reviewer_persona?: string | null
           signal_score?: number | null
+          status?: string | null
           updated_at?: string | null
           use_case?: string[] | null
           website?: string | null
@@ -129,6 +135,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           editorial_summary?: string | null
+          email?: string | null
           features?: Json | null
           id?: string
           logo?: string | null
@@ -136,8 +143,10 @@ export type Database = {
           name?: string
           price?: string | null
           pricing?: Json | null
+          rejection_reason?: string | null
           reviewer_persona?: string | null
           signal_score?: number | null
+          status?: string | null
           updated_at?: string | null
           use_case?: string[] | null
           website?: string | null
