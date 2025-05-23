@@ -34,6 +34,8 @@ export const submissionService = {
         badges: ['new'], // Mark as new submission
         logo: '📦', // Default logo
         editorial_summary: `New submission: ${submission.description}`,
+        email: submission.email, // Store the submitter's email
+        status: 'pending' // Mark submission as pending
       })
       .select()
       .single();
