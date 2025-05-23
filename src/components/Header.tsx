@@ -17,12 +17,12 @@ import { cn } from "@/lib/utils";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, Sun, Moon } from "lucide-react";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function Header() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("light");
 
