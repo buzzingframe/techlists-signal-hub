@@ -6,7 +6,7 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { OnboardingProvider } from "@/contexts/OnboardingContext";
+import { OnboardingProvider, useOnboarding } from "@/contexts/OnboardingContext";
 import { OnboardingProgress } from "./OnboardingProgress";
 import { OnboardingContent } from "./OnboardingContent";
 import { OnboardingNavigation } from "./OnboardingNavigation";
