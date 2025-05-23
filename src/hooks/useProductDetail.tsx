@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Product } from "@/types/product";
 import { mockProductData } from "@/components/product/mockProductData";
 
@@ -10,15 +10,37 @@ interface UseProductDetailOptions {
 export function useProductDetail(productId?: string, options?: UseProductDetailOptions) {
   const [product, setProduct] = useState<Product | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const isEnabled = options?.enabled !== undefined ? options.enabled : true;
+  // Memoize the enabled state to prevent unnecessary re-renders
+  const isEnabled = useMemo(() => 
+    options?.enabled !== undefined ? options.enabled : true, 
+    [options?.enabled]
+  );
+  
+  // Memoize the handle save function
+  const handleSave = useCallback(() => {
+    setIsSaved(prev => !prev);
+    console.log(`Product ${isSaved ? 'unsaved' : 'saved'}`);
+  }, [isSaved]);
+  
+  // Memoize the review submitted handler
+  const handleReviewSubmitted = useCallback(() => {
+    console.log("Review submitted successfully");
+  }, []);
   
   useEffect(() => {
-    // Skip fetching if not enabled or no productId
+    // Skip if not enabled or no productId
     if (!isEnabled || !productId) {
       setIsLoading(false);
+      setProduct(null);
+      setError(null);
+      return;
+    }
+    
+    // Prevent duplicate fetches for the same product
+    if (product && product.id === productId) {
       return;
     }
     
@@ -27,48 +49,44 @@ export function useProductDetail(productId?: string, options?: UseProductDetailO
     setProduct(null);
     setError(null);
     
-    // Scroll to top when the page loads (only on full page, not in modal)
-    if (!options) {
+    // Scroll to top only on full page (not in modal)
+    if (!options?.enabled) {
       window.scrollTo(0, 0);
     }
     
     console.log(`Fetching product data for ID: ${productId}`);
     
-    // In a real app, we would fetch the product data based on productId
-    // For now we'll just use our mock data after a short delay to simulate loading
-    const timer = setTimeout(() => {
-      try {
-        // In a real app, this would be a fetch call to get the specific product
-        // For now, we'll use mock data
-        setProduct(mockProductData);
-        setIsLoading(false);
-        console.log("Product data loaded successfully");
-      } catch (err) {
-        setError("Failed to load product data");
-        setIsLoading(false);
-        console.error("Error loading product data:", err);
-      }
-    }, 600); // Slightly longer delay to make loading state visible
+    // Use AbortController to cancel previous requests
+    const abortController = new AbortController();
     
-    return () => clearTimeout(timer);
-  }, [productId, isEnabled, options]);
+    const timer = setTimeout(() => {
+      if (!abortController.signal.aborted) {
+        try {
+          setProduct(mockProductData);
+          setIsLoading(false);
+          console.log("Product data loaded successfully");
+        } catch (err) {
+          if (!abortController.signal.aborted) {
+            setError("Failed to load product data");
+            setIsLoading(false);
+            console.error("Error loading product data:", err);
+          }
+        }
+      }
+    }, 600);
+    
+    return () => {
+      clearTimeout(timer);
+      abortController.abort();
+    };
+  }, [productId, isEnabled, options?.enabled, product?.id]); // More specific dependencies
   
-  const handleSave = () => {
-    setIsSaved(!isSaved);
-    console.log(`Product ${isSaved ? 'unsaved' : 'saved'}`);
-  };
-  
-  const handleReviewSubmitted = () => {
-    // In a real app, you would refresh the reviews data here
-    console.log("Review submitted successfully");
-  };
-  
-  return {
+  return useMemo(() => ({
     product,
     isLoading,
     error,
     isSaved,
     handleSave,
     handleReviewSubmitted
-  };
+  }), [product, isLoading, error, isSaved, handleSave, handleReviewSubmitted]);
 }
