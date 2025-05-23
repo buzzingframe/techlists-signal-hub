@@ -10,10 +10,31 @@ import { ProductLayout } from "@/components/product/ProductLayout";
 
 export default function ProductDetail() {
   const { productId } = useParams();
-  const { product, isSaved, handleSave, handleReviewSubmitted, isLoading } = useProductDetail(productId);
+  const { product, isSaved, handleSave, handleReviewSubmitted, isLoading, error } = useProductDetail(productId);
+
+  // Determine error message based on error type
+  let errorMessage = "Product not found";
+  let hasError = false;
+
+  if (error) {
+    hasError = true;
+    if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+  } else if (!product && !isLoading) {
+    hasError = true;
+    errorMessage = "Product not found";
+  }
 
   return (
-    <ProductErrorBoundary isLoading={isLoading} hasError={!product && !isLoading}>
+    <ProductErrorBoundary 
+      isLoading={isLoading} 
+      hasError={hasError}
+      errorMessage={errorMessage}
+      productId={productId}
+    >
       <ProductLayout>
         {product && (
           <>

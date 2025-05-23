@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGridSkeleton } from "@/components/loading/ProductGridSkeleton";
+import { NetworkError } from "@/components/error/NetworkError";
 import { 
   Select,
   SelectContent,
@@ -13,7 +14,7 @@ import { useProducts } from "@/hooks/useProducts";
 
 export function ProductFeedSection() {
   const [sortBy, setSortBy] = useState("signalScore");
-  const { products, isLoading, error } = useProducts();
+  const { products, isLoading, error, refetch, isOffline } = useProducts();
 
   // Memoize sorted products to prevent unnecessary re-renders
   const sortedProducts = useMemo(() => {
@@ -35,14 +36,24 @@ export function ProductFeedSection() {
 
   const displayProducts = sortedProducts.slice(0, 9);
 
-  if (error) {
+  if (error || isOffline) {
     return (
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-destructive">Failed to load products</h2>
-            <p className="mt-2 text-muted-foreground">Please try refreshing the page.</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Latest Products</h2>
+              <p className="text-muted-foreground text-sm md:text-base">
+                Discover the newest and most promising Web3 tools
+              </p>
+            </div>
           </div>
+          
+          <NetworkError 
+            isOffline={isOffline}
+            onRetry={refetch}
+            message={error ? (error as Error).message : undefined}
+          />
         </div>
       </section>
     );
