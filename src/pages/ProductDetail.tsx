@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReviewSection } from "@/components/ReviewSection";
@@ -178,6 +178,11 @@ export default function ProductDetail() {
   
   // In a real app, we would fetch the product data based on productId
   const product = productData;
+
+  // Scroll to top when the page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleSave = () => {
     setIsSaved(!isSaved);

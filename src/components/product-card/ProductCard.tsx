@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { StackCreationModal } from "@/components/stack/StackCreationModal";
 import { useStacks } from "@/hooks/useStacks";
+import { useProductModal } from "@/contexts/ProductModalContext";
 import { ProductCardHeader } from "./ProductCardHeader";
 import { ProductCardBadges } from "./ProductCardBadges";
 import { ProductCardFooter } from "./ProductCardFooter";
@@ -27,13 +28,14 @@ export function ProductCard({ product, className, onViewDetails }: ProductCardPr
   const [stackModalOpen, setStackModalOpen] = useState(false);
   const { stacks, createStack, addProductToStack } = useStacks();
   const navigate = useNavigate();
+  const { openProductModal } = useProductModal();
 
   const handleViewDetails = () => {
     if (onViewDetails) {
       onViewDetails();
     } else {
-      // Default behavior - navigate to the product detail page
-      navigate(`/product/${product.id}`);
+      // Default behavior - open the product detail modal
+      openProductModal(product as any); // Cast to any since our product might not have all fields
     }
   };
 
