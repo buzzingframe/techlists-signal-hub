@@ -1,231 +1,222 @@
 
-import { useState } from 'react';
+import React from 'react';
 import { useDebug } from '@/contexts/DebugContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, Bug, Network, BarChart3, Settings, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { X, Bug, Network, Gauge, Database } from 'lucide-react';
 
 export function DebugPanel() {
   const debug = useDebug();
-  const [isMinimized, setIsMinimized] = useState(false);
 
   if (!debug.isDebugMode || !debug.isPanelOpen) {
     return null;
   }
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit',
-      fractionalSecondDigits: 3
+    return date.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
   };
 
-  return (
-    <div className="fixed top-4 right-4 z-[9999] w-96 max-h-[80vh] bg-background border border-border rounded-lg shadow-2xl">
-      <Card className="h-full">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Bug className="h-4 w-4" />
-              Debug Panel
-              <Badge variant="outline" className="text-xs">DEV</Badge>
-            </CardTitle>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMinimized(!isMinimized)}
-              >
-                {isMinimized ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={debug.clearLogs}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={debug.togglePanel}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        
-        {!isMinimized && (
-          <CardContent className="p-2">
-            <Tabs defaultValue="errors" className="h-full">
-              <TabsList className="grid w-full grid-cols-4 text-xs">
-                <TabsTrigger value="errors" className="text-xs">
-                  Errors {debug.errors.length > 0 && (
-                    <Badge variant="destructive" className="ml-1 text-xs px-1">
-                      {debug.errors.length}
-                    </Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="network" className="text-xs">
-                  Network {debug.networkRequests.length > 0 && (
-                    <Badge variant="secondary" className="ml-1 text-xs px-1">
-                      {debug.networkRequests.length}
-                    </Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="performance" className="text-xs">
-                  Perf
-                </TabsTrigger>
-                <TabsTrigger value="state" className="text-xs">
-                  State
-                </TabsTrigger>
-              </TabsList>
+  const getErrorTypeColor = (type: string) => {
+    switch (type) {
+      case 'error': return 'bg-red-500';
+      case 'warning': return 'bg-yellow-500';
+      default: return 'bg-blue-500';
+    }
+  };
 
-              <TabsContent value="errors" className="mt-2">
-                <ScrollArea className="h-64">
-                  <div className="space-y-2">
-                    {debug.errors.length === 0 ? (
-                      <p className="text-xs text-muted-foreground text-center py-4">
-                        No errors logged
-                      </p>
-                    ) : (
-                      debug.errors.map((error) => (
-                        <div key={error.id} className="p-2 border rounded text-xs">
-                          <div className="flex items-center justify-between mb-1">
-                            <Badge 
-                              variant={error.type === 'error' ? 'destructive' : 
-                                     error.type === 'warning' ? 'secondary' : 'outline'}
-                              className="text-xs"
-                            >
+  const getStatusColor = (status?: number) => {
+    if (!status) return 'bg-gray-500';
+    if (status >= 200 && status < 300) return 'bg-green-500';
+    if (status >= 400) return 'bg-red-500';
+    return 'bg-yellow-500';
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 w-96 h-96 bg-background border border-border rounded-lg shadow-lg z-50 flex flex-col">
+      <div className="flex items-center justify-between p-3 border-b border-border">
+        <div className="flex items-center gap-2">
+          <Bug className="h-4 w-4" />
+          <span className="font-semibold text-sm">Debug Panel</span>
+          <Badge variant="secondary" className="text-xs">DEV</Badge>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={debug.clearLogs}
+            className="h-6 px-2 text-xs"
+          >
+            Clear
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={debug.togglePanel}
+            className="h-6 w-6 p-0"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+
+      <Tabs defaultValue="errors" className="flex-1 flex flex-col">
+        <TabsList className="grid w-full grid-cols-4 h-8">
+          <TabsTrigger value="errors" className="text-xs flex items-center gap-1">
+            <Bug className="h-3 w-3" />
+            Errors ({debug.errors.length})
+          </TabsTrigger>
+          <TabsTrigger value="network" className="text-xs flex items-center gap-1">
+            <Network className="h-3 w-3" />
+            Network ({debug.networkRequests.length})
+          </TabsTrigger>
+          <TabsTrigger value="performance" className="text-xs flex items-center gap-1">
+            <Gauge className="h-3 w-3" />
+            Perf ({debug.performanceMetrics.length})
+          </TabsTrigger>
+          <TabsTrigger value="state" className="text-xs flex items-center gap-1">
+            <Database className="h-3 w-3" />
+            State
+          </TabsTrigger>
+        </TabsList>
+
+        <div className="flex-1 overflow-hidden">
+          <TabsContent value="errors" className="h-full m-0">
+            <ScrollArea className="h-full">
+              <div className="p-2 space-y-2">
+                {debug.errors.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">No errors logged</p>
+                ) : (
+                  debug.errors.map((error) => (
+                    <Card key={error.id} className="p-2">
+                      <div className="flex items-start gap-2">
+                        <div className={`w-2 h-2 rounded-full ${getErrorTypeColor(error.type)} mt-1`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <Badge variant={error.type === 'error' ? 'destructive' : 'secondary'} className="text-xs">
                               {error.type}
                             </Badge>
-                            <span className="text-muted-foreground text-xs">
-                              {formatTime(error.timestamp)}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{formatTime(error.timestamp)}</span>
                           </div>
-                          <p className="text-xs break-words">{error.message}</p>
+                          <p className="text-xs font-mono break-words">{error.message}</p>
                           {error.component && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Component: {error.component}
-                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">Component: {error.component}</p>
                           )}
                         </div>
-                      ))
-                    )}
-                  </div>
-                </ScrollArea>
-              </TabsContent>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
 
-              <TabsContent value="network" className="mt-2">
-                <ScrollArea className="h-64">
-                  <div className="space-y-2">
-                    {debug.networkRequests.length === 0 ? (
-                      <p className="text-xs text-muted-foreground text-center py-4">
-                        No network requests logged
-                      </p>
-                    ) : (
-                      debug.networkRequests.map((request) => (
-                        <div key={request.id} className="p-2 border rounded text-xs">
-                          <div className="flex items-center justify-between mb-1">
+          <TabsContent value="network" className="h-full m-0">
+            <ScrollArea className="h-full">
+              <div className="p-2 space-y-2">
+                {debug.networkRequests.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">No network requests logged</p>
+                ) : (
+                  debug.networkRequests.map((request) => (
+                    <Card key={request.id} className="p-2">
+                      <div className="flex items-start gap-2">
+                        <div className={`w-2 h-2 rounded-full ${getStatusColor(request.status)} mt-1`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-1">
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {request.method}
-                              </Badge>
+                              <Badge variant="outline" className="text-xs">{request.method}</Badge>
                               {request.status && (
-                                <Badge 
-                                  variant={request.status < 400 ? 'default' : 'destructive'}
-                                  className="text-xs"
-                                >
+                                <Badge variant={request.status >= 400 ? 'destructive' : 'secondary'} className="text-xs">
                                   {request.status}
                                 </Badge>
                               )}
                             </div>
-                            <span className="text-muted-foreground text-xs">
-                              {formatTime(request.timestamp)}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{formatTime(request.timestamp)}</span>
                           </div>
-                          <p className="text-xs break-all mb-1">{request.url}</p>
+                          <p className="text-xs font-mono break-all">{request.url}</p>
                           {request.duration && (
-                            <p className="text-xs text-muted-foreground">
-                              Duration: {request.duration}ms
-                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">{request.duration}ms</p>
                           )}
                           {request.error && (
-                            <p className="text-xs text-destructive">
-                              Error: {request.error}
-                            </p>
+                            <p className="text-xs text-red-500 mt-1">{request.error}</p>
                           )}
                         </div>
-                      ))
-                    )}
-                  </div>
-                </ScrollArea>
-              </TabsContent>
-
-              <TabsContent value="performance" className="mt-2">
-                <ScrollArea className="h-64">
-                  <div className="space-y-2">
-                    {debug.performanceMetrics.length === 0 ? (
-                      <p className="text-xs text-muted-foreground text-center py-4">
-                        No performance metrics logged
-                      </p>
-                    ) : (
-                      debug.performanceMetrics.map((metric) => (
-                        <div key={metric.id} className="p-2 border rounded text-xs">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium">{metric.name}</span>
-                            <span className="text-muted-foreground text-xs">
-                              {formatTime(metric.timestamp)}
-                            </span>
-                          </div>
-                          <p className="text-xs">
-                            {metric.value} {metric.unit}
-                          </p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </ScrollArea>
-              </TabsContent>
-
-              <TabsContent value="state" className="mt-2">
-                <ScrollArea className="h-64">
-                  <div className="space-y-2">
-                    <div className="p-2 border rounded text-xs">
-                      <h4 className="font-medium mb-2">Current Environment</h4>
-                      <div className="space-y-1">
-                        <p>Mode: {import.meta.env.MODE}</p>
-                        <p>Dev: {import.meta.env.DEV ? 'Yes' : 'No'}</p>
-                        <p>URL: {window.location.pathname}</p>
-                        <p>User Agent: {navigator.userAgent.slice(0, 50)}...</p>
                       </div>
-                    </div>
-                    
-                    <div className="p-2 border rounded text-xs">
-                      <h4 className="font-medium mb-2">Component Renders</h4>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="performance" className="h-full m-0">
+            <ScrollArea className="h-full">
+              <div className="p-2 space-y-2">
+                {debug.performanceMetrics.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">No performance metrics logged</p>
+                ) : (
+                  debug.performanceMetrics.map((metric) => (
+                    <Card key={metric.id} className="p-2">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs font-medium">{metric.name}</span>
+                        <span className="text-xs text-muted-foreground">{formatTime(metric.timestamp)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono">{metric.value} {metric.unit}</span>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="state" className="h-full m-0">
+            <ScrollArea className="h-full">
+              <div className="p-2 space-y-2">
+                <Card className="p-2">
+                  <h4 className="text-xs font-medium mb-2">Component Renders</h4>
+                  {debug.componentRenders.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No component renders logged</p>
+                  ) : (
+                    <div className="space-y-1">
                       {debug.componentRenders.slice(0, 5).map((render) => (
-                        <div key={render.id} className="mb-1">
-                          <div className="flex justify-between">
-                            <span>{render.component}</span>
-                            <span>{render.renderTime}ms</span>
-                          </div>
+                        <div key={render.id} className="flex items-center justify-between">
+                          <span className="text-xs">{render.component}</span>
+                          <span className="text-xs text-muted-foreground">{render.renderTime}ms</span>
                         </div>
                       ))}
                     </div>
+                  )}
+                </Card>
+                
+                <Card className="p-2">
+                  <h4 className="text-xs font-medium mb-2">Debug Info</h4>
+                  <div className="space-y-1 text-xs">
+                    <div>Mode: Development</div>
+                    <div>Panel Open: {debug.isPanelOpen ? 'Yes' : 'No'}</div>
+                    <div>Total Errors: {debug.errors.length}</div>
+                    <div>Network Requests: {debug.networkRequests.length}</div>
                   </div>
-                </ScrollArea>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        )}
-      </Card>
+                </Card>
+              </div>
+            </ScrollArea>
+          </TabsContent>
+        </div>
+      </Tabs>
+
+      <div className="p-2 border-t border-border">
+        <p className="text-xs text-muted-foreground text-center">
+          Press Ctrl+Shift+D to toggle panel
+        </p>
+      </div>
     </div>
   );
 }
