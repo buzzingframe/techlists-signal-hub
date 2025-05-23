@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ProductCard } from "@/components/ProductCard";
+import { CuratedListHero } from "@/components/curated-list/CuratedListHero";
+import { CuratedListAdminControls } from "@/components/curated-list/CuratedListAdminControls";
+import { CuratedListProductGrid } from "@/components/curated-list/CuratedListProductGrid";
 import { 
   Select,
   SelectContent,
@@ -109,7 +111,6 @@ export default function CuratedListDetail() {
   const { listId } = useParams<{ listId: string }>();
   const [list, setList] = useState<CuratedList | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [sortBy, setSortBy] = useState("signalScore");
   const [isAdmin, setIsAdmin] = useState(true); // This would normally be determined by auth/role
   
   useEffect(() => {
@@ -137,18 +138,6 @@ export default function CuratedListDetail() {
     });
   };
 
-  // Sort products based on selected sort option
-  const sortedProducts = [...products].sort((a, b) => {
-    if (sortBy === "signalScore") {
-      return b.signalScore - a.signalScore;
-    } else if (sortBy === "alphabetical") {
-      return a.name.localeCompare(b.name);
-    } else if (sortBy === "category") {
-      return a.category.localeCompare(b.category);
-    }
-    return 0;
-  });
-
   if (!list) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -172,49 +161,10 @@ export default function CuratedListDetail() {
       <Header />
       
       <main className="flex-1">
-        {/* Hero section with cover image if available */}
-        {list.coverImage && (
-          <div className="relative h-60 md:h-80 w-full">
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30">
-              <img 
-                src={list.coverImage}
-                alt={list.title}
-                className="w-full h-full object-cover mix-blend-overlay"
-              />
-            </div>
-            <div className="container mx-auto px-4 h-full flex items-end pb-8">
-              <div className="text-white">
-                <h1 className="text-3xl md:text-4xl font-bold">{list.title}</h1>
-                <div className="flex items-center mt-2">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <span>Updated {formatDate(list.updatedAt)}</span>
-                  {list.isPinned && <Pin className="h-4 w-4 ml-4 mr-2 text-yellow-400" />}
-                  {list.isPinned && <span>Pinned</span>}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Hero section */}
+        <CuratedListHero list={list} formatDate={formatDate} />
         
         <div className="container mx-auto px-4 py-8">
-          {/* Header if no cover image */}
-          {!list.coverImage && (
-            <div className="mb-6">
-              <div className="flex items-center justify-between">
-                <h1 className="text-3xl md:text-4xl font-bold">{list.title}</h1>
-                {list.isPinned && (
-                  <Badge variant="outline" className="border-yellow-400 text-yellow-600 flex items-center gap-1">
-                    <Pin className="h-3.5 w-3.5" /> Pinned
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center mt-2 text-muted-foreground">
-                <Calendar className="h-4 w-4 mr-2" />
-                <span>Updated {formatDate(list.updatedAt)}</span>
-              </div>
-            </div>
-          )}
-          
           {/* Description */}
           <div className="mb-8">
             <p className="text-lg md:text-xl">{list.description}</p>
@@ -229,59 +179,10 @@ export default function CuratedListDetail() {
           </div>
           
           {/* Admin Controls */}
-          {isAdmin && (
-            <div className="bg-muted/50 border rounded-lg p-4 mb-8">
-              <h2 className="font-medium mb-3">Admin Controls</h2>
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" className="flex items-center gap-1">
-                  <Edit className="w-4 h-4" /> Edit Details
-                </Button>
-                <Button size="sm" variant="outline" className="flex items-center gap-1">
-                  <Plus className="w-4 h-4" /> Add Products
-                </Button>
-                <Button size="sm" variant="outline" className="flex items-center gap-1">
-                  <MoveVertical className="w-4 h-4" /> Reorder
-                </Button>
-                <Button size="sm" variant="outline" className="flex items-center gap-1">
-                  {list.isPinned ? <Pin className="w-4 h-4" /> : <Pin className="w-4 h-4" />} 
-                  {list.isPinned ? "Unpin" : "Pin to Homepage"}
-                </Button>
-                <Button size="sm" variant="destructive" className="flex items-center gap-1">
-                  <Trash2 className="w-4 h-4" /> Delete List
-                </Button>
-              </div>
-            </div>
-          )}
+          <CuratedListAdminControls list={list} isAdmin={isAdmin} />
           
-          {/* Products Section - Updated to use consistent modal behavior */}
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Products ({products.length})</h2>
-              <div className="flex items-center">
-                <span className="mr-2 text-sm text-muted-foreground">Sort by:</span>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="signalScore">Signal Score</SelectItem>
-                    <SelectItem value="alphabetical">A-Z</SelectItem>
-                    <SelectItem value="category">Category</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedProducts.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  className="h-full" 
-                />
-              ))}
-            </div>
-          </div>
+          {/* Products Section */}
+          <CuratedListProductGrid products={products} />
         </div>
       </main>
       
