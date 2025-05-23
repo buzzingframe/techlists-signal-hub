@@ -1,7 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, BarChart } from "@/components/ui/chart";
 import { ArrowUp, ArrowDown } from "lucide-react";
+import * as React from "react";
+import { 
+  ChartContainer, 
+  ChartTooltipContent, 
+  ChartTooltip 
+} from "@/components/ui/chart";
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as RechartsLineChart, Line } from "recharts";
+import { cn } from "@/lib/utils";
 
 export function AdminStats() {
   // Mock stats data
@@ -25,6 +32,14 @@ export function AdminStats() {
     { name: "Fri", submissions: 5 },
     { name: "Sat", submissions: 1 },
     { name: "Sun", submissions: 2 },
+  ];
+
+  const categoryChartData = [
+    { category: "Wallet", count: 12 },
+    { category: "DeFi", count: 24 },
+    { category: "NFT", count: 18 },
+    { category: "DAO", count: 9 },
+    { category: "Dev", count: 15 },
   ];
   
   return (
@@ -64,14 +79,29 @@ export function AdminStats() {
             <CardTitle>Submissions Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <LineChart
-              data={submissionsChartData}
-              index="name"
-              categories={["submissions"]}
-              colors={["blue"]}
-              valueFormatter={(value) => `${value} items`}
+            <ChartContainer 
               className="aspect-[4/3]"
-            />
+              config={{
+                submissions: {
+                  label: "Submissions",
+                  color: "#2563eb",
+                }
+              }}
+            >
+              <RechartsLineChart data={submissionsChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line 
+                  type="monotone" 
+                  dataKey="submissions" 
+                  stroke="var(--color-submissions, #2563eb)" 
+                  strokeWidth={2} 
+                  activeDot={{ r: 6 }}
+                />
+              </RechartsLineChart>
+            </ChartContainer>
           </CardContent>
         </Card>
         
@@ -80,20 +110,27 @@ export function AdminStats() {
             <CardTitle>Product Categories</CardTitle>
           </CardHeader>
           <CardContent>
-            <BarChart
-              data={[
-                { category: "Wallet", count: 12 },
-                { category: "DeFi", count: 24 },
-                { category: "NFT", count: 18 },
-                { category: "DAO", count: 9 },
-                { category: "Dev", count: 15 },
-              ]}
-              index="category"
-              categories={["count"]}
-              colors={["violet"]}
-              valueFormatter={(value) => `${value} products`}
+            <ChartContainer 
               className="aspect-[4/3]"
-            />
+              config={{
+                count: {
+                  label: "Products",
+                  color: "#8b5cf6",
+                }
+              }}
+            >
+              <RechartsBarChart data={categoryChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="category" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar 
+                  dataKey="count" 
+                  fill="var(--color-count, #8b5cf6)" 
+                  radius={[4, 4, 0, 0]} 
+                />
+              </RechartsBarChart>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
