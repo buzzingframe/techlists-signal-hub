@@ -2,8 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SignalScoreBadge } from "./SignalScoreBadge";
-import { Bell } from "lucide-react";
+import { Bell, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { StackCreationModal } from "./stack/StackCreationModal";
+import { useStacks } from "@/hooks/useStacks";
 
 export interface ProductCardProps {
   product: {
@@ -20,6 +23,9 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
+  const [stackModalOpen, setStackModalOpen] = useState(false);
+  const { stacks, createStack, addProductToStack } = useStacks();
+  
   const getPriceColor = (price: string) => {
     switch (price) {
       case "Free": return "text-green-600 bg-green-50 dark:bg-green-900/20";
@@ -79,18 +85,40 @@ export function ProductCard({ product, className }: ProductCardProps) {
             {product.price}
           </Badge>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
-          >
-            View Details
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+              onClick={() => setStackModalOpen(true)}
+            >
+              <Layers className="w-4 h-4 mr-1" />
+              Add to Stack
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+            >
+              View Details
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Hover Glow Effect */}
       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      
+      {/* Stack Creation Modal */}
+      <StackCreationModal
+        isOpen={stackModalOpen}
+        onClose={() => setStackModalOpen(false)}
+        product={product}
+        existingStacks={stacks}
+        onCreateStack={createStack}
+        onAddToStack={addProductToStack}
+      />
     </div>
   );
 }
