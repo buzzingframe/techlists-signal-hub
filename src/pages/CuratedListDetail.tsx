@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -254,7 +253,7 @@ export default function CuratedListDetail() {
             </div>
           )}
           
-          {/* Products Section */}
+          {/* Products Section - Updated to use consistent modal behavior */}
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold">Products ({products.length})</h2>
@@ -275,11 +274,11 @@ export default function CuratedListDetail() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedProducts.map((product) => (
-                <div key={product.id} className="h-full">
-                  <Link to={`/product/${product.id}`} className="block h-full">
-                    <ProductCard product={product} className="h-full" />
-                  </Link>
-                </div>
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  className="h-full" 
+                />
               ))}
             </div>
           </div>
