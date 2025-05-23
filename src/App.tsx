@@ -1,149 +1,86 @@
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { ProductModalProvider } from "./contexts/ProductModalContext";
+import { DebugProvider } from "./contexts/DebugContext";
+import { DebugPanel } from "./components/debug/DebugPanel";
+import { useDebugNetworkMonitor } from "./hooks/useDebugNetworkMonitor";
+import Index from "./pages/Index";
+import SubmitProduct from "./pages/SubmitProduct";
+import Pricing from "./pages/Pricing";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+import Product from "./pages/Product";
+import Category from "./pages/Category";
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+import RequestPasswordReset from "./pages/RequestPasswordReset";
+import Onboarding from "./pages/Onboarding";
+import NotFound from "./pages/NotFound";
+import { ProductLayout } from "./components/product/ProductLayout";
+import { CategoryLayout } from "./components/category/CategoryLayout";
+import { AppLayout } from "./components/AppLayout";
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import { ProductModalProvider } from './contexts/ProductModalContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { ProductDetailModal } from './components/product/ProductDetailModal';
-import { ErrorBoundary } from './components/error/ErrorBoundary';
-import Index from './pages/Index';
-import Auth from './pages/Auth';
-import ProductDetail from './pages/ProductDetail';
-import NotFound from './pages/NotFound';
-import UserProfile from './pages/UserProfile';
-import SubmitProduct from './pages/SubmitProduct';
-import CuratedLists from './pages/CuratedLists';
-import CuratedListDetail from './pages/CuratedListDetail';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminCuratedListForm from './pages/AdminCuratedListForm';
-import AdminProductSelector from './pages/AdminProductSelector';
-import AdminNewsEditor from './pages/AdminNewsEditor';
-import AdminNews from './pages/AdminNews';
-import NewsIndex from './pages/NewsIndex';
-import NewsArticle from './pages/NewsArticle';
-import StackDetail from './pages/StackDetail';
-import StackEdit from './pages/StackEdit';
+const queryClient = new QueryClient();
 
-function App() {
+function AppContent() {
+  useDebugNetworkMonitor();
+  
   return (
-    <ErrorBoundary>
-      <BrowserRouter>
-        <AuthProvider>
-          <ProductModalProvider>
-            <ErrorBoundary>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/product/:productId" element={
-                  <ErrorBoundary>
-                    <ProductDetail />
-                  </ErrorBoundary>
-                } />
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <UserProfile />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/submit" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <SubmitProduct />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/curated-lists" element={
-                  <ErrorBoundary>
-                    <CuratedLists />
-                  </ErrorBoundary>
-                } />
-                <Route path="/curated-lists/:listId" element={
-                  <ErrorBoundary>
-                    <CuratedListDetail />
-                  </ErrorBoundary>
-                } />
-                <Route path="/news" element={
-                  <ErrorBoundary>
-                    <NewsIndex />
-                  </ErrorBoundary>
-                } />
-                <Route path="/news/:slug" element={
-                  <ErrorBoundary>
-                    <NewsArticle />
-                  </ErrorBoundary>
-                } />
-                <Route path="/admin" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminDashboard />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/list/new" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminCuratedListForm />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/list/:listId" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminCuratedListForm />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/list/:listId/select-products" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminProductSelector />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/news/new" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminNewsEditor />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/news/:newsId" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminNewsEditor />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/news" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AdminNews />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="/stacks/:stackId" element={
-                  <ErrorBoundary>
-                    <StackDetail />
-                  </ErrorBoundary>
-                } />
-                <Route path="/stacks/:stackId/edit" element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <StackEdit />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                } />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </ErrorBoundary>
-            
-            {/* Render the ProductDetailModal at the application root level */}
-            <ProductDetailModal />
-          </ProductModalProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/submit" element={<SubmitProduct />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/request-password-reset" element={<RequestPasswordReset />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/admin" element={<Admin />} />
+
+        <Route path="/product/:slug" element={<ProductLayout><Product /></ProductLayout>} />
+        <Route path="/category/:slug" element={<CategoryLayout><Category /></CategoryLayout>} />
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <DebugPanel />
+    </>
   );
 }
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <DebugProvider>
+        <AuthProvider>
+          <OnboardingProvider>
+            <ProductModalProvider>
+              <BrowserRouter>
+                <AppContent />
+                <Toaster />
+                <Sonner />
+              </BrowserRouter>
+            </ProductModalProvider>
+          </OnboardingProvider>
+        </AuthProvider>
+      </DebugProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;

@@ -17,6 +17,9 @@ import { MediaStep } from "@/components/submission/steps/MediaStep";
 import { FeaturesStep } from "@/components/submission/steps/FeaturesStep";
 import { ReviewStep } from "@/components/submission/steps/ReviewStep";
 import { ProductFeature } from "@/components/submission/FeatureBuilder";
+import { useDebugFormMonitor } from "@/hooks/useDebugFormMonitor";
+import { useDebugComponentMonitor } from "@/hooks/useDebugComponentMonitor";
+import { useDebug } from "@/contexts/DebugContext";
 
 const formSchema = z.object({
   name: z.string().min(2, "Product name must be at least 2 characters."),
@@ -36,11 +39,15 @@ const formSchema = z.object({
 
 export default function SubmitProduct() {
   const { toast } = useToast();
+  const debug = useDebug();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [features, setFeatures] = useState<ProductFeature[]>([]);
+
+  // Debug monitoring
+  useDebugComponentMonitor('SubmitProduct', { isSubmitting, isSubmitted });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,6 +64,9 @@ export default function SubmitProduct() {
       integrations: "",
     },
   });
+
+  // Debug form monitoring
+  const { logFormSubmission } = useDebugFormMonitor(form, 'ProductSubmission');
 
   // Check if each step can proceed
   const canProceed: boolean[] = [
@@ -115,7 +125,10 @@ export default function SubmitProduct() {
   ];
 
   async function onSubmit() {
+    const startTime = performance.now();
+    
     if (!form.formState.isValid) {
+      logFormSubmission(false);
       toast({
         variant: "destructive",
         title: "Form validation failed",
@@ -128,6 +141,15 @@ export default function SubmitProduct() {
     
     try {
       const values = form.getValues();
+      
+      // Debug logging
+      if (debug.isDebugMode) {
+        debug.addPerformanceMetric({
+          name: 'Submission - Data Preparation',
+          value: Math.round(performance.now() - startTime),
+          unit: 'ms'
+        });
+      }
       
       const submission: SubmissionWithMedia = {
         name: values.name,
@@ -148,6 +170,16 @@ export default function SubmitProduct() {
       
       await submissionService.submitProduct(submission);
       
+      const totalTime = Math.round(performance.now() - startTime);
+      if (debug.isDebugMode) {
+        debug.addPerformanceMetric({
+          name: 'Submission - Total Time',
+          value: totalTime,
+          unit: 'ms'
+        });
+      }
+      
+      logFormSubmission(true, values);
       setIsSubmitted(true);
       toast({
         title: "Product submitted successfully",
@@ -155,6 +187,16 @@ export default function SubmitProduct() {
       });
     } catch (error) {
       console.error('Submission error:', error);
+      
+      if (debug.isDebugMode) {
+        debug.addError({
+          message: `Submission failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          component: 'SubmitProduct',
+          type: 'error'
+        });
+      }
+      
+      logFormSubmission(false);
       toast({
         variant: "destructive",
         title: "Submission failed",
@@ -171,6 +213,14 @@ export default function SubmitProduct() {
     setLogoFile(null);
     setMediaFiles([]);
     setFeatures([]);
+    
+    if (debug.isDebugMode) {
+      debug.addPerformanceMetric({
+        name: 'Form Reset',
+        value: 1,
+        unit: 'action'
+      });
+    }
   };
 
   return (
