@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
-interface Media {
+export interface Media {
   type: "image" | "video";
   url: string;
   caption: string;
