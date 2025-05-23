@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminSubmissions } from "@/components/admin/AdminSubmissions";
-import { AdminReviews } from "@/components/admin/AdminReviews";
+import { AdminReviewsReal } from "@/components/admin/AdminReviewsReal";
 import { AdminListManager } from "@/components/admin/AdminListManager";
 import { AdminTags } from "@/components/admin/AdminTags";
 import { AdminNewsManager } from "@/components/admin/AdminNewsManager";
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
         <div className="mt-6">
           {activeTab === "dashboard" && <AdminStats />}
           {activeTab === "submissions" && <AdminSubmissions />}
-          {activeTab === "reviews" && <AdminReviews />}
+          {activeTab === "reviews" && <AdminReviewsReal />}
           {activeTab === "lists" && <AdminListManager />}
           {activeTab === "news" && <AdminNewsManager />}
           {activeTab === "tags" && <AdminTags />}
