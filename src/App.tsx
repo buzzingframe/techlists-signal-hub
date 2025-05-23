@@ -17,6 +17,10 @@ import AdminCuratedListForm from "./pages/AdminCuratedListForm";
 import AdminProductSelector from "./pages/AdminProductSelector";
 import UserProfile from "./pages/UserProfile";
 import AdminDashboard from "./pages/AdminDashboard";
+import NewsIndex from "./pages/NewsIndex";
+import NewsArticle from "./pages/NewsArticle";
+import AdminNews from "./pages/AdminNews";
+import AdminNewsEditor from "./pages/AdminNewsEditor";
 
 const queryClient = new QueryClient();
 
@@ -38,17 +42,15 @@ const App = () => {
           setIsAuthenticated(true);
           
           // Check if user has completed onboarding
-          const { data, error } = await supabase
+          const { data } = await supabase
             .from('profiles')
             .select('has_completed_onboarding')
             .eq('id', session.user.id)
             .single();
             
-          if (error) {
-            console.error("Error checking onboarding status:", error);
-          } else {
+          if (data) {
             // If onboarding hasn't been completed, show the onboarding flow
-            setShowOnboarding(data?.has_completed_onboarding !== true);
+            setShowOnboarding(data.has_completed_onboarding !== true);
           }
         }
       } catch (error) {
@@ -115,7 +117,17 @@ const App = () => {
             <Route path="/curated-lists/:listId/edit" element={<AdminCuratedListForm />} />
             <Route path="/curated-lists/:listId/products" element={<AdminProductSelector />} />
             <Route path="/profile" element={<UserProfile />} />
+            
+            {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/news" element={<AdminNews />} />
+            <Route path="/admin/news/new" element={<AdminNewsEditor />} />
+            <Route path="/admin/news/:articleId/edit" element={<AdminNewsEditor />} />
+            
+            {/* News routes */}
+            <Route path="/news" element={<NewsIndex />} />
+            <Route path="/news/:slug" element={<NewsArticle />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -7,6 +7,7 @@ import { AdminSubmissions } from "@/components/admin/AdminSubmissions";
 import { AdminReviews } from "@/components/admin/AdminReviews";
 import { AdminListManager } from "@/components/admin/AdminListManager";
 import { AdminTags } from "@/components/admin/AdminTags";
+import { AdminNewsManager } from "@/components/admin/AdminNewsManager";
 import { AdminTabs } from "@/components/admin/AdminTabs";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -95,8 +96,9 @@ export default function AdminDashboard() {
                 <Plus className="w-4 h-4 mr-1" />
                 Create New List
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setActiveTab("tags")}>
-                Go to Tag Editor
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin/news/new")}>
+                <Plus className="w-4 h-4 mr-1" />
+                Add News Article
               </Button>
             </div>
           </div>
@@ -111,6 +113,7 @@ export default function AdminDashboard() {
           {activeTab === "submissions" && <AdminSubmissions />}
           {activeTab === "reviews" && <AdminReviews />}
           {activeTab === "lists" && <AdminListManager />}
+          {activeTab === "news" && <AdminNewsManager />}
           {activeTab === "tags" && <AdminTags />}
         </div>
       </main>
