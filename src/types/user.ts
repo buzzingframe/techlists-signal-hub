@@ -13,6 +13,7 @@ export interface UserProfile {
     reviewsWritten: number;
     stacksCreated: number;
   };
+  hasCompletedOnboarding?: boolean;
 }
 
 export interface UserReview {
@@ -49,6 +50,9 @@ export interface UserSettings {
     reviewComments: boolean;
     productUpdates: boolean;
     newFeatures: boolean;
+    savedProductReviews?: boolean;
+    weeklyDigest?: boolean;
+    reviewReplies?: boolean;
   };
   privacySettings: {
     publicProfile: boolean;
@@ -59,4 +63,26 @@ export interface UserSettings {
     email?: string;
     walletAddress?: string;
   };
+}
+
+export type UserInterest = 
+  | "wallets" 
+  | "dao_tools" 
+  | "nft_utilities" 
+  | "developer_infra" 
+  | "defi" 
+  | "security" 
+  | "analytics" 
+  | "identity";
+
+export type UserRole = 
+  | "developer" 
+  | "founder" 
+  | "researcher" 
+  | "trader" 
+  | "explorer";
+
+export interface UserPreferences {
+  interests: UserInterest[];
+  role: UserRole;
 }

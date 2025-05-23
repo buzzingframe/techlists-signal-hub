@@ -1,3 +1,4 @@
+
 export interface Review {
   id: string;
   product_id: string;
@@ -12,9 +13,10 @@ export interface Review {
   status: 'active' | 'needs_moderation' | 'rejected';
   created_at: string;
   updated_at: string;
+  flagReason?: FlagReason;
+  flaggedAt?: string;
 }
 
-// Adding this type definition if it doesn't exist
 export type FlagReason = 
   | "inappropriate"
   | "spam"
