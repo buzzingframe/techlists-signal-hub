@@ -34,19 +34,22 @@ export function ProductTabContent({ product, onReviewSubmitted }: ProductTabCont
         </div>
         
         <TabsContent value="overview">
-          <ProductOverviewTab features={product.features} media={product.media} />
+          <ProductOverviewTab 
+            features={product.features || []} 
+            media={product.media || []} 
+          />
         </TabsContent>
         
         <TabsContent value="pricing">
-          <ProductPricingTab pricing={product.pricing} />
+          <ProductPricingTab pricing={product.pricing || {}} />
         </TabsContent>
         
         <TabsContent value="reviews">
-          <ReviewSection reviews={product.reviews} />
+          <ReviewSection reviews={product.reviews || []} />
         </TabsContent>
         
         <TabsContent value="alternatives">
-          <ProductAlternativesTab alternatives={product.alternatives} />
+          <ProductAlternativesTab alternatives={product.alternatives || []} />
         </TabsContent>
       </Tabs>
     </div>

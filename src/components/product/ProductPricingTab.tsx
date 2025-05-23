@@ -16,30 +16,30 @@ interface PricingFormat {
 }
 
 interface ProductPricingTabProps {
-  pricing: Record<string, {
+  pricing?: Record<string, {
     name: string;
     price: string;
     features: string[];
   }>;
 }
 
-export function ProductPricingTab({ pricing }: ProductPricingTabProps) {
+export function ProductPricingTab({ pricing = {} }: ProductPricingTabProps) {
   // Convert the pricing data to the format expected by PricingTable
   const formattedPricing: PricingFormat = {
     free: pricing.free || {
       name: "Free",
       price: "Free",
-      features: ["Basic features"]
+      features: ["Basic features", "Community support"]
     },
     pro: pricing.pro || {
       name: "Pro",
-      price: "$99",
-      features: ["Advanced features"]
+      price: "$29/month",
+      features: ["Advanced features", "Priority support", "Analytics"]
     },
     enterprise: pricing.enterprise || {
       name: "Enterprise",
       price: "Contact us",
-      features: ["All features"]
+      features: ["All features", "Custom integrations", "Dedicated support"]
     }
   };
 
