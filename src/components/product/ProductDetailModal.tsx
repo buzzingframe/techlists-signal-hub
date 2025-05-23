@@ -24,6 +24,11 @@ export function ProductDetailModal() {
     { enabled: isModalOpen && !!productData?.id }
   );
   
+  // If the modal is not open, don't render anything
+  if (!isModalOpen) {
+    return null;
+  }
+  
   // When loading, show a loading state
   if (isLoading && isModalOpen) {
     return (

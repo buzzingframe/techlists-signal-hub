@@ -1,7 +1,9 @@
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProductModalProvider } from './contexts/ProductModalContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { ProductDetailModal } from './components/product/ProductDetailModal';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import ProductDetail from './pages/ProductDetail';
@@ -24,67 +26,72 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/product/:productId" element={<ProductDetail />} />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <UserProfile />
-            </ProtectedRoute>
-          } />
-          <Route path="/submit" element={
-            <ProtectedRoute>
-              <SubmitProduct />
-            </ProtectedRoute>
-          } />
-          <Route path="/curated-lists" element={<CuratedLists />} />
-          <Route path="/curated-lists/:listId" element={<CuratedListDetail />} />
-          <Route path="/news" element={<NewsIndex />} />
-          <Route path="/news/:slug" element={<NewsArticle />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/list/new" element={
-            <ProtectedRoute>
-              <AdminCuratedListForm />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/list/:listId" element={
-            <ProtectedRoute>
-              <AdminCuratedListForm />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/list/:listId/select-products" element={
-            <ProtectedRoute>
-              <AdminProductSelector />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/news/new" element={
-            <ProtectedRoute>
-              <AdminNewsEditor />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/news/:newsId" element={
-            <ProtectedRoute>
-              <AdminNewsEditor />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/news" element={
-            <ProtectedRoute>
-              <AdminNews />
-            </ProtectedRoute>
-          } />
-          <Route path="/stacks/:stackId" element={<StackDetail />} />
-          <Route path="/stacks/:stackId/edit" element={
-            <ProtectedRoute>
-              <StackEdit />
-            </ProtectedRoute>
-          } />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ProductModalProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/product/:productId" element={<ProductDetail />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/submit" element={
+              <ProtectedRoute>
+                <SubmitProduct />
+              </ProtectedRoute>
+            } />
+            <Route path="/curated-lists" element={<CuratedLists />} />
+            <Route path="/curated-lists/:listId" element={<CuratedListDetail />} />
+            <Route path="/news" element={<NewsIndex />} />
+            <Route path="/news/:slug" element={<NewsArticle />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/list/new" element={
+              <ProtectedRoute>
+                <AdminCuratedListForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/list/:listId" element={
+              <ProtectedRoute>
+                <AdminCuratedListForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/list/:listId/select-products" element={
+              <ProtectedRoute>
+                <AdminProductSelector />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news/new" element={
+              <ProtectedRoute>
+                <AdminNewsEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news/:newsId" element={
+              <ProtectedRoute>
+                <AdminNewsEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news" element={
+              <ProtectedRoute>
+                <AdminNews />
+              </ProtectedRoute>
+            } />
+            <Route path="/stacks/:stackId" element={<StackDetail />} />
+            <Route path="/stacks/:stackId/edit" element={
+              <ProtectedRoute>
+                <StackEdit />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          
+          {/* Render the ProductDetailModal at the application root level */}
+          <ProductDetailModal />
+        </ProductModalProvider>
       </AuthProvider>
     </BrowserRouter>
   );

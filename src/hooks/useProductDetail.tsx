@@ -32,6 +32,8 @@ export function useProductDetail(productId?: string, options?: UseProductDetailO
       window.scrollTo(0, 0);
     }
     
+    console.log(`Fetching product data for ID: ${productId}`);
+    
     // In a real app, we would fetch the product data based on productId
     // For now we'll just use our mock data after a short delay to simulate loading
     const timer = setTimeout(() => {
@@ -40,9 +42,11 @@ export function useProductDetail(productId?: string, options?: UseProductDetailO
         // For now, we'll use mock data
         setProduct(mockProductData);
         setIsLoading(false);
+        console.log("Product data loaded successfully");
       } catch (err) {
         setError("Failed to load product data");
         setIsLoading(false);
+        console.error("Error loading product data:", err);
       }
     }, 600); // Slightly longer delay to make loading state visible
     
@@ -51,6 +55,7 @@ export function useProductDetail(productId?: string, options?: UseProductDetailO
   
   const handleSave = () => {
     setIsSaved(!isSaved);
+    console.log(`Product ${isSaved ? 'unsaved' : 'saved'}`);
   };
   
   const handleReviewSubmitted = () => {
