@@ -42,7 +42,7 @@ ListItem.displayName = "ListItem";
 
 export function NavigationItems() {
   return (
-    <NavigationMenu>
+    <NavigationMenu className="relative z-50">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
