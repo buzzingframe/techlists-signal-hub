@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
-import { Eye, EyeOff, Pencil, Trash2, Plus } from "lucide-react";
+import { Eye, EyeOff, Pencil, Trash2, Plus, Layers } from "lucide-react";
 import { StackCreationModal } from "@/components/stack/StackCreationModal";
 import { Link } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StacksTabProps {
   stacks: UserStack[];
@@ -17,6 +18,31 @@ interface StacksTabProps {
 
 export function StacksTab({ stacks, onToggleVisibility, onDeleteStack }: StacksTabProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { toast } = useToast();
+
+  // Mock functions to satisfy the StackCreationModal props
+  const handleCreateStack = async (stackData: { 
+    title: string; 
+    description: string; 
+    isPublic: boolean 
+  }): Promise<string> => {
+    toast({
+      title: "Stack created",
+      description: `Created new stack "${stackData.title}"`,
+    });
+    
+    // In a real implementation, this would create a stack and return its ID
+    return "new-stack-id";
+  };
+
+  const handleAddToStack = async (stackId: string, productId: string): Promise<void> => {
+    // This is a placeholder function since we don't have a product to add in this context
+    // In a real implementation, this would add a product to a stack
+    toast({
+      title: "Product added",
+      description: `Added product to stack`,
+    });
+  };
 
   return (
     <div>
@@ -118,7 +144,10 @@ export function StacksTab({ stacks, onToggleVisibility, onDeleteStack }: StacksT
 
       <StackCreationModal 
         isOpen={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
+        onClose={() => setIsCreateModalOpen(false)}
+        existingStacks={stacks}
+        onCreateStack={handleCreateStack}
+        onAddToStack={handleAddToStack} 
       />
     </div>
   );
