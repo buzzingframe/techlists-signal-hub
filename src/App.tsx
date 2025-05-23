@@ -1,6 +1,9 @@
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import Index from './pages/Index';
+import Auth from './pages/Auth';
 import ProductDetail from './pages/ProductDetail';
 import NotFound from './pages/NotFound';
 import UserProfile from './pages/UserProfile';
@@ -20,26 +23,69 @@ import StackEdit from './pages/StackEdit';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/product/:productId" element={<ProductDetail />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/submit" element={<SubmitProduct />} />
-        <Route path="/curated-lists" element={<CuratedLists />} />
-        <Route path="/curated-lists/:listId" element={<CuratedListDetail />} />
-        <Route path="/news" element={<NewsIndex />} />
-        <Route path="/news/:slug" element={<NewsArticle />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/list/new" element={<AdminCuratedListForm />} />
-        <Route path="/admin/list/:listId" element={<AdminCuratedListForm />} />
-        <Route path="/admin/list/:listId/select-products" element={<AdminProductSelector />} />
-        <Route path="/admin/news/new" element={<AdminNewsEditor />} />
-        <Route path="/admin/news/:newsId" element={<AdminNewsEditor />} />
-        <Route path="/admin/news" element={<AdminNews />} />
-        <Route path="/stacks/:stackId" element={<StackDetail />} />
-        <Route path="/stacks/:stackId/edit" element={<StackEdit />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/product/:productId" element={<ProductDetail />} />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          } />
+          <Route path="/submit" element={
+            <ProtectedRoute>
+              <SubmitProduct />
+            </ProtectedRoute>
+          } />
+          <Route path="/curated-lists" element={<CuratedLists />} />
+          <Route path="/curated-lists/:listId" element={<CuratedListDetail />} />
+          <Route path="/news" element={<NewsIndex />} />
+          <Route path="/news/:slug" element={<NewsArticle />} />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/list/new" element={
+            <ProtectedRoute>
+              <AdminCuratedListForm />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/list/:listId" element={
+            <ProtectedRoute>
+              <AdminCuratedListForm />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/list/:listId/select-products" element={
+            <ProtectedRoute>
+              <AdminProductSelector />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/news/new" element={
+            <ProtectedRoute>
+              <AdminNewsEditor />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/news/:newsId" element={
+            <ProtectedRoute>
+              <AdminNewsEditor />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/news" element={
+            <ProtectedRoute>
+              <AdminNews />
+            </ProtectedRoute>
+          } />
+          <Route path="/stacks/:stackId" element={<StackDetail />} />
+          <Route path="/stacks/:stackId/edit" element={
+            <ProtectedRoute>
+              <StackEdit />
+            </ProtectedRoute>
+          } />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
