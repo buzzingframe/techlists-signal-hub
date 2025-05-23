@@ -5,14 +5,14 @@ import { SignalScoreBadge } from "./SignalScoreBadge";
 import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ProductCardProps {
+export interface ProductCardProps {
   product: {
     id: string;
     name: string;
     category: string;
     signalScore: number;
     logo: string;
-    price: "Free" | "$" | "$$";
+    price: "Free" | "$" | "$$" | "Freemium";
     badges: string[];
     description: string;
   };
@@ -25,6 +25,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
       case "Free": return "text-green-600 bg-green-50 dark:bg-green-900/20";
       case "$": return "text-blue-600 bg-blue-50 dark:bg-blue-900/20";
       case "$$": return "text-purple-600 bg-purple-50 dark:bg-purple-900/20";
+      case "Freemium": return "text-teal-600 bg-teal-50 dark:bg-teal-900/20";
       default: return "text-gray-600 bg-gray-50 dark:bg-gray-900/20";
     }
   };

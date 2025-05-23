@@ -8,6 +8,10 @@ import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import SubmitProduct from "./pages/SubmitProduct";
 import NotFound from "./pages/NotFound";
+import CuratedLists from "./pages/CuratedLists";
+import CuratedListDetail from "./pages/CuratedListDetail";
+import AdminCuratedListForm from "./pages/AdminCuratedListForm";
+import AdminProductSelector from "./pages/AdminProductSelector";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +25,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/submit" element={<SubmitProduct />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/curated-lists" element={<CuratedLists />} />
+          <Route path="/curated-lists/:listId" element={<CuratedListDetail />} />
+          <Route path="/curated-lists/create" element={<AdminCuratedListForm />} />
+          <Route path="/curated-lists/:listId/edit" element={<AdminCuratedListForm />} />
+          <Route path="/curated-lists/:listId/products" element={<AdminProductSelector />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
