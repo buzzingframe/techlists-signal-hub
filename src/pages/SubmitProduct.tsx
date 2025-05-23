@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -60,10 +59,10 @@ export default function SubmitProduct() {
   });
 
   // Check if each step can proceed
-  const canProceed = [
+  const canProceed: boolean[] = [
     // Step 1: Basic info - all required fields filled
-    form.watch("name") && form.watch("website") && form.watch("category") && 
-    form.watch("description") && form.watch("useCase") && form.watch("price"),
+    Boolean(form.watch("name") && form.watch("website") && form.watch("category") && 
+    form.watch("description") && form.watch("useCase") && form.watch("price")),
     
     // Step 2: Media - no strict requirements, optional
     true,
@@ -72,7 +71,7 @@ export default function SubmitProduct() {
     true,
     
     // Step 4: Review - email is required
-    form.watch("email")
+    Boolean(form.watch("email"))
   ];
 
   const steps = [
