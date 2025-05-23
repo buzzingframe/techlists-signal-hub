@@ -6,9 +6,13 @@ export function getFlagBadgeColor(reason: FlagReason) {
     case "inappropriate":
       return "destructive" as const;
     case "spam":
-      return "secondary" as const;
+      return "orange" as const;
     case "duplicate":
-      return "outline" as const;
+      return "purple" as const;
+    case "false_information":
+      return "yellow" as const;
+    case "off_topic":
+      return "green" as const;
     default:
       return "secondary" as const;
   }

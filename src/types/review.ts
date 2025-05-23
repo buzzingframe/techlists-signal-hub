@@ -1,4 +1,3 @@
-
 export interface Review {
   id: string;
   product_id: string;
@@ -18,8 +17,8 @@ export interface Review {
 }
 
 export type FlagReason = 
-  | "inappropriate"
-  | "spam"
+  | "inappropriate" 
+  | "spam" 
   | "duplicate"
-  | "off-topic"
-  | "other";
+  | "false_information"
+  | "off_topic";
