@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Submission } from "./types";
 
@@ -9,6 +10,7 @@ export function useSubmissionActions(refetch: () => void) {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleApprove = async (submission: Submission) => {
     try {
@@ -27,6 +29,8 @@ export function useSubmissionActions(refetch: () => void) {
         description: `${submission.name} has been published to the site.`
       });
       
+      // Invalidate the query cache to trigger a refetch
+      await queryClient.invalidateQueries({ queryKey: ['product-submissions'] });
       refetch();
     } catch (error) {
       console.error("Error approving submission:", error);
@@ -65,6 +69,9 @@ export function useSubmissionActions(refetch: () => void) {
       setIsRejectDialogOpen(false);
       setRejectionReason("");
       setSelectedSubmission(null);
+      
+      // Invalidate the query cache to trigger a refetch
+      await queryClient.invalidateQueries({ queryKey: ['product-submissions'] });
       refetch();
     } catch (error) {
       console.error("Error rejecting submission:", error);

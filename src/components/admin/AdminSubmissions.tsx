@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { SubmissionsTable } from "./submissions/SubmissionsTable";
 import { RejectDialog } from "./submissions/RejectDialog";
 import { useSubmissions } from "./submissions/useSubmissions";
@@ -34,6 +34,15 @@ export function AdminSubmissions() {
     return (
       <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
         <p>Error loading submissions. Please try again later.</p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="mt-2"
+          onClick={() => refetch()}
+        >
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Retry
+        </Button>
       </div>
     );
   }
@@ -42,7 +51,18 @@ export function AdminSubmissions() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Product Submissions</h2>
-        <Button size="sm" variant="outline">Export CSV</Button>
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => refetch()}
+            disabled={isLoading}
+          >
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Refresh
+          </Button>
+          <Button size="sm" variant="outline">Export CSV</Button>
+        </div>
       </div>
 
       {submissions.length === 0 ? (
