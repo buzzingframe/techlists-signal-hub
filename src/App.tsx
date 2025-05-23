@@ -12,6 +12,7 @@ import CuratedLists from "./pages/CuratedLists";
 import CuratedListDetail from "./pages/CuratedListDetail";
 import AdminCuratedListForm from "./pages/AdminCuratedListForm";
 import AdminProductSelector from "./pages/AdminProductSelector";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/curated-lists/create" element={<AdminCuratedListForm />} />
           <Route path="/curated-lists/:listId/edit" element={<AdminCuratedListForm />} />
           <Route path="/curated-lists/:listId/products" element={<AdminProductSelector />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
