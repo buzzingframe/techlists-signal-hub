@@ -36,7 +36,7 @@ import * as z from "zod";
 import { Check, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { submissionService } from "@/services/submissionService";
+import { submissionService, ProductSubmission } from "@/services/submissionService";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -84,7 +84,18 @@ export default function SubmitProduct() {
     setIsSubmitting(true);
     
     try {
-      await submissionService.submitProduct(values);
+      // Ensure all fields are defined as required by ProductSubmission
+      const submission: ProductSubmission = {
+        name: values.name,
+        website: values.website,
+        category: values.category,
+        description: values.description,
+        useCase: values.useCase,
+        price: values.price,
+        email: values.email,
+      };
+      
+      await submissionService.submitProduct(submission);
       
       setIsSubmitted(true);
       toast({
