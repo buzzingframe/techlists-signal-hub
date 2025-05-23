@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -12,38 +12,44 @@ import { ProductAlternativesTab } from "@/components/product/ProductAlternatives
 import { ProductEditorialReview } from "@/components/product/ProductEditorialReview";
 import { ReviewSection } from "@/components/ReviewSection";
 import { ReviewModal } from "@/components/ReviewModal";
+import { useProductDetail } from "@/hooks/useProductDetail";
 
 export function ProductDetailModal() {
   const { isModalOpen, productData, closeProductModal } = useProductModal();
   const navigate = useNavigate();
   
+  // Use the same hook as the full product page to fetch complete data
+  const { product, handleReviewSubmitted } = useProductDetail(
+    productData?.id,
+    // Only fetch when modal is open and we have a product ID
+    { enabled: isModalOpen && !!productData?.id }
+  );
+  
+  // Use the complete product data if available, otherwise fall back to the basic data
+  const displayProduct = product || productData;
+  
   const handleOpenFullPage = () => {
-    if (productData) {
-      navigate(`/product/${productData.id}`);
+    if (displayProduct) {
+      navigate(`/product/${displayProduct.id}`);
       closeProductModal();
     }
   };
 
-  if (!productData) {
+  if (!displayProduct) {
     return null;
   }
-
-  const handleReviewSubmitted = () => {
-    // In a real app, you would refresh the reviews data here
-    console.log("Review submitted successfully");
-  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeProductModal()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
         <div className="flex flex-col">
           {/* Header */}
-          <div className="p-6 pb-2 border-b flex items-center justify-between bg-background sticky top-0 z-10">
+          <DialogHeader className="p-6 pb-2 border-b flex items-center justify-between bg-background sticky top-0 z-10">
             <div className="flex items-center gap-3">
-              <div className="text-3xl">{productData.logo}</div>
+              <div className="text-3xl">{displayProduct.logo}</div>
               <div>
-                <h2 className="text-xl font-semibold">{productData.name}</h2>
-                <p className="text-muted-foreground">{productData.category}</p>
+                <DialogTitle className="text-xl font-semibold">{displayProduct.name}</DialogTitle>
+                <p className="text-muted-foreground">{displayProduct.category}</p>
               </div>
             </div>
             <Button 
@@ -55,11 +61,11 @@ export function ProductDetailModal() {
               <ExternalLink className="w-4 h-4" />
               Full Page
             </Button>
-          </div>
+          </DialogHeader>
           
           {/* Product Meta Overview */}
           <div className="px-6 py-4 border-b">
-            <ProductMetaOverview product={productData} />
+            <ProductMetaOverview product={displayProduct} />
           </div>
           
           {/* Tabs */}
@@ -75,45 +81,45 @@ export function ProductDetailModal() {
                 
                 {/* Review Button */}
                 <ReviewModal 
-                  productId={productData.id} 
-                  productName={productData.name}
+                  productId={displayProduct.id} 
+                  productName={displayProduct.name}
                   onReviewSubmitted={handleReviewSubmitted}
                 />
               </div>
               
               <TabsContent value="overview">
-                {productData.features && productData.media && (
+                {displayProduct.features && displayProduct.media && (
                   <ProductOverviewTab 
-                    features={productData.features} 
-                    media={productData.media} 
+                    features={displayProduct.features} 
+                    media={displayProduct.media} 
                   />
                 )}
               </TabsContent>
               
               <TabsContent value="pricing">
-                {productData.pricing && (
-                  <ProductPricingTab pricing={productData.pricing} />
+                {displayProduct.pricing && (
+                  <ProductPricingTab pricing={displayProduct.pricing} />
                 )}
               </TabsContent>
               
               <TabsContent value="reviews">
-                {productData.reviews && (
-                  <ReviewSection reviews={productData.reviews} />
+                {displayProduct.reviews && (
+                  <ReviewSection reviews={displayProduct.reviews} />
                 )}
               </TabsContent>
               
               <TabsContent value="alternatives">
-                {productData.alternatives && (
-                  <ProductAlternativesTab alternatives={productData.alternatives} />
+                {displayProduct.alternatives && (
+                  <ProductAlternativesTab alternatives={displayProduct.alternatives} />
                 )}
               </TabsContent>
             </Tabs>
           </div>
           
           {/* Admin Review */}
-          {productData.adminReview && (
+          {displayProduct.adminReview && (
             <div className="px-6 pb-6">
-              <ProductEditorialReview adminReview={productData.adminReview} />
+              <ProductEditorialReview adminReview={displayProduct.adminReview} />
             </div>
           )}
         </div>

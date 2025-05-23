@@ -3,14 +3,32 @@ import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { mockProductData } from "@/components/product/mockProductData";
 
-export function useProductDetail(productId?: string) {
+interface UseProductDetailOptions {
+  enabled?: boolean;
+}
+
+export function useProductDetail(productId?: string, options?: UseProductDetailOptions) {
   const [product, setProduct] = useState<Product | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
+  const isEnabled = options?.enabled !== undefined ? options.enabled : true;
+  
   useEffect(() => {
-    // Scroll to top when the page loads
-    window.scrollTo(0, 0);
+    // Skip fetching if not enabled
+    if (!isEnabled) {
+      setIsLoading(false);
+      return;
+    }
+    
+    // Scroll to top when the page loads (only on full page, not in modal)
+    if (!options) {
+      window.scrollTo(0, 0);
+    }
+    
+    // Reset state when product ID changes
+    setIsLoading(true);
+    setProduct(null);
     
     // In a real app, we would fetch the product data based on productId
     // For now we'll just use our mock data after a short delay to simulate loading
@@ -20,7 +38,7 @@ export function useProductDetail(productId?: string) {
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [productId]);
+  }, [productId, isEnabled, options]);
   
   const handleSave = () => {
     setIsSaved(!isSaved);
