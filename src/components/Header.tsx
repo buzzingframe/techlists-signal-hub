@@ -3,8 +3,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Bell, User, Sun, Moon } from "lucide-react";
+import { User, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationsDropdown } from "./notifications/NotificationsDropdown";
 
 interface HeaderProps {
   className?: string;
@@ -12,7 +13,6 @@ interface HeaderProps {
 
 export function Header({ className }: HeaderProps) {
   const [isDark, setIsDark] = useState(false);
-  const [notificationCount] = useState(3);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -58,18 +58,8 @@ export function Header({ className }: HeaderProps) {
             )}
           </Button>
 
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="w-9 h-9 p-0 relative">
-            <Bell className="w-4 h-4" />
-            {notificationCount > 0 && (
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 w-5 h-5 p-0 text-xs flex items-center justify-center"
-              >
-                {notificationCount}
-              </Badge>
-            )}
-          </Button>
+          {/* Notifications Dropdown */}
+          <NotificationsDropdown />
 
           {/* Profile */}
           <Button variant="ghost" size="sm" className="w-9 h-9 p-0">
