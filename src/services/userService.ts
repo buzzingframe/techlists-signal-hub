@@ -1,6 +1,34 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { UserProfile, UserPreferences } from "@/types/user";
+import { UserProfile, UserPreferences, UserInterest, UserRole } from "@/types/user";
+
+async function getSavedProductsCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('saved_products')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Error getting saved products count:', error);
+    return 0;
+  }
+
+  return count || 0;
+}
+
+async function getReviewsCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('reviews')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Error getting reviews count:', error);
+    return 0;
+  }
+
+  return count || 0;
+}
 
 export const userService = {
   async getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -19,8 +47,8 @@ export const userService = {
 
     // Get user stats
     const [savedCount, reviewsCount] = await Promise.all([
-      this.getSavedProductsCount(userId),
-      this.getReviewsCount(userId)
+      getSavedProductsCount(userId),
+      getReviewsCount(userId)
     ]);
 
     return {
@@ -71,8 +99,8 @@ export const userService = {
     if (!data) return null;
 
     return {
-      interests: data.interests || [],
-      role: data.role
+      interests: data.interests as UserInterest[] || [],
+      role: data.role as UserRole
     };
   },
 
@@ -147,33 +175,5 @@ export const userService = {
     }
 
     return !!data;
-  },
-
-  private async getSavedProductsCount(userId: string): Promise<number> {
-    const { count, error } = await supabase
-      .from('saved_products')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error getting saved products count:', error);
-      return 0;
-    }
-
-    return count || 0;
-  },
-
-  private async getReviewsCount(userId: string): Promise<number> {
-    const { count, error } = await supabase
-      .from('reviews')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error getting reviews count:', error);
-      return 0;
-    }
-
-    return count || 0;
   }
 };

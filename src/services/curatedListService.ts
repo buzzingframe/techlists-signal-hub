@@ -14,7 +14,7 @@ export interface DatabaseCuratedList {
   updated_at: string;
   profiles?: {
     username: string;
-  };
+  } | null;
 }
 
 export const curatedListService = {
@@ -70,7 +70,7 @@ export const curatedListService = {
   }
 };
 
-function transformDatabaseList(dbList: DatabaseCuratedList): CuratedList {
+function transformDatabaseList(dbList: any): CuratedList {
   return {
     id: dbList.id,
     title: dbList.title,
