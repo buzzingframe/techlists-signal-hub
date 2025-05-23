@@ -15,6 +15,7 @@ import AdminNews from './pages/AdminNews';
 import NewsIndex from './pages/NewsIndex';
 import NewsArticle from './pages/NewsArticle';
 import StackDetail from './pages/StackDetail';
+import StackEdit from './pages/StackEdit';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/admin/news/:newsId" element={<AdminNewsEditor />} />
         <Route path="/admin/news" element={<AdminNews />} />
         <Route path="/stacks/:stackId" element={<StackDetail />} />
+        <Route path="/stacks/:stackId/edit" element={<StackEdit />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

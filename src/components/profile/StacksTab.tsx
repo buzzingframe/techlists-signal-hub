@@ -1,91 +1,98 @@
 
+import { useState } from "react";
 import { UserStack } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
-import { Layers, Eye, EyeOff, Pencil, Trash2, Plus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Eye, EyeOff, Pencil, Trash2, Plus } from "lucide-react";
 import { StackCreationModal } from "@/components/stack/StackCreationModal";
-import { useStacks } from "@/hooks/useStacks";
+import { Link } from "react-router-dom";
 
-export function StacksTab() {
-  const navigate = useNavigate();
-  const { stacks, createStack, addProductToStack, toggleStackVisibility, deleteStack } = useStacks();
-  const [newStackModalOpen, setNewStackModalOpen] = useState(false);
-  
-  const handleCreateStack = async (stackData: { title: string; description: string; isPublic: boolean }) => {
-    const newStackId = await createStack(stackData);
-    return newStackId;
-  };
-  
-  const handleViewStack = (stackId: string) => {
-    navigate(`/stacks/${stackId}`);
-  };
-  
-  const handleEditStack = (stackId: string) => {
-    navigate(`/stacks/${stackId}/edit`);
-  };
+interface StacksTabProps {
+  stacks: UserStack[];
+  onToggleVisibility: (stackId: string) => void;
+  onDeleteStack: (stackId: string) => void;
+}
+
+export function StacksTab({ stacks, onToggleVisibility, onDeleteStack }: StacksTabProps) {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">My Stacks</h2>
-        <Button onClick={() => setNewStackModalOpen(true)}>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="h-4 w-4 mr-1" />
-          New Stack
+          Create Stack
         </Button>
       </div>
 
       {stacks.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {stacks.map((stack) => (
             <Card key={stack.id} className="overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-medium text-lg">{stack.title}</h3>
-                  <Badge variant="outline" className={stack.isPublic ? 
-                    "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/30" : 
-                    "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800/30"
-                  }>
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between">
+                  <CardTitle className="text-lg">{stack.title}</CardTitle>
+                  <Badge variant={stack.isPublic ? "outline" : "secondary"} className="ml-2">
                     {stack.isPublic ? "Public" : "Private"}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">{stack.description}</p>
-                <p className="text-sm">
-                  <span className="font-medium">{stack.productIds.length}</span>{" "}
-                  <span className="text-muted-foreground">products in stack</span>
+              </CardHeader>
+              
+              <CardContent className="pb-2">
+                <p className="text-muted-foreground text-sm">
+                  {stack.description}
                 </p>
-              </CardContent>
-              <CardFooter className="bg-muted/30 px-6 py-3 flex justify-between">
-                <span className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground mt-2">
                   Created {formatDistanceToNow(new Date(stack.createdAt), { addSuffix: true })}
-                </span>
-                <div className="flex gap-1">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0" 
-                    onClick={() => toggleStackVisibility(stack.id)}
-                  >
-                    {stack.isPublic ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </p>
+                <div className="mt-2">
+                  <Badge variant="outline" className="mr-2">
+                    {stack.productIds.length} products
+                  </Badge>
+                </div>
+              </CardContent>
+              
+              <CardFooter className="flex justify-between pt-2">
+                <div>
+                  <Button variant="ghost" size="sm" onClick={() => onToggleVisibility(stack.id)}>
+                    {stack.isPublic ? (
+                      <>
+                        <EyeOff className="h-4 w-4 mr-1" />
+                        Make Private
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Make Public
+                      </>
+                    )}
+                  </Button>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm">
+                    <Link to={`/stacks/${stack.id}`}>
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Link to={`/stacks/${stack.id}/edit`}>
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Edit
+                    </Link>
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-8 w-8 p-0" 
-                    onClick={() => handleEditStack(stack.id)}
+                    className="text-red-500 hover:text-red-600"
+                    onClick={() => onDeleteStack(stack.id)}
                   >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0" 
-                    onClick={() => deleteStack(stack.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
                   </Button>
                 </div>
               </CardFooter>
@@ -93,28 +100,25 @@ export function StacksTab() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Layers className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <h3 className="text-lg font-medium mb-2">No stacks created yet</h3>
-            <CardDescription className="text-center">
-              Create collections of your favorite tools to share with others.
-            </CardDescription>
-            <Button className="mt-4" onClick={() => setNewStackModalOpen(true)}>
-              <Plus className="h-4 w-4 mr-1" />
+        <Card className="text-center p-6">
+          <CardContent className="pt-6 flex flex-col items-center">
+            <div className="rounded-full bg-muted w-12 h-12 flex items-center justify-center mb-4">
+              <Layers className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">No stacks yet</h3>
+            <p className="text-muted-foreground">
+              Create a stack to group products together and share with others.
+            </p>
+            <Button className="mt-4" onClick={() => setIsCreateModalOpen(true)}>
               Create Your First Stack
             </Button>
           </CardContent>
         </Card>
       )}
-      
-      {/* New Stack Modal */}
-      <StackCreationModal
-        isOpen={newStackModalOpen}
-        onClose={() => setNewStackModalOpen(false)}
-        existingStacks={[]}
-        onCreateStack={handleCreateStack}
-        onAddToStack={addProductToStack}
+
+      <StackCreationModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
       />
     </div>
   );

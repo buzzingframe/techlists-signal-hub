@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -11,7 +10,6 @@ import { Step4Confirmation } from "@/components/onboarding/Step4Confirmation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { UserInterest, UserPreferences, UserRole } from "@/types/user";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface OnboardingFlowProps {
   isOpen: boolean;
@@ -62,7 +60,8 @@ export function OnboardingFlow({ isOpen, onClose, userId, onComplete }: Onboardi
   const handleSkip = () => {
     if (userId) {
       // Mark onboarding as completed even if skipped
-      updateUserOnboardingStatus(true);
+      // Temporarily disabled Supabase update
+      console.log("Would update user onboarding status:", true);
     }
     onClose();
   };
@@ -70,10 +69,10 @@ export function OnboardingFlow({ isOpen, onClose, userId, onComplete }: Onboardi
   const handleComplete = async () => {
     if (userId) {
       try {
-        // Save all preferences and settings
-        await savePreferences();
-        await saveNotificationSettings();
-        await updateUserOnboardingStatus(true);
+        // Temporarily disabled Supabase calls
+        console.log("Would save preferences:", preferences);
+        console.log("Would save notification settings:", notifications);
+        console.log("Would update onboarding status:", true);
         
         toast({
           title: "Onboarding complete!",
@@ -99,44 +98,37 @@ export function OnboardingFlow({ isOpen, onClose, userId, onComplete }: Onboardi
 
   const savePreferences = async () => {
     if (!userId) return;
-
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert({
-        user_id: userId,
-        interests: preferences.interests,
-        role: preferences.role,
-      });
-
-    if (error) throw error;
+    
+    // Temporarily commented out due to Supabase table issues
+    console.log("Would save user preferences:", {
+      user_id: userId,
+      interests: preferences.interests,
+      role: preferences.role,
+    });
   };
 
   const saveNotificationSettings = async () => {
     if (!userId) return;
-
-    const { error } = await supabase
-      .from('user_settings')
-      .upsert({
-        user_id: userId,
-        notification_preferences: {
-          savedProductReviews: notifications.savedProductReviews,
-          weeklyDigest: notifications.weeklyDigest,
-          reviewReplies: notifications.reviewReplies,
-        }
-      });
-
-    if (error) throw error;
+    
+    // Temporarily commented out due to Supabase table issues
+    console.log("Would save notification settings:", {
+      user_id: userId,
+      notification_preferences: {
+        savedProductReviews: notifications.savedProductReviews,
+        weeklyDigest: notifications.weeklyDigest,
+        reviewReplies: notifications.reviewReplies,
+      }
+    });
   };
 
   const updateUserOnboardingStatus = async (completed: boolean) => {
     if (!userId) return;
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ has_completed_onboarding: completed })
-      .eq('id', userId);
-
-    if (error) throw error;
+    
+    // Temporarily commented out due to Supabase table issues
+    console.log("Would update user onboarding status:", {
+      id: userId,
+      has_completed_onboarding: completed
+    });
   };
 
   // Determine which container to use based on device

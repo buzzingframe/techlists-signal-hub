@@ -21,13 +21,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { format } from "date-fns";
 import { FlagReason, Review } from "@/types/review"; 
 
+// Define a type that matches our mock data structure
+interface FlaggedReview {
+  id: string;
+  productName: string;
+  reviewer: string;
+  rating: number;
+  content: string;
+  flagReason: FlagReason;
+  flaggedAt: string;
+  reviewerType: string;
+}
+
 export function AdminReviews() {
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [selectedReview, setSelectedReview] = useState<FlaggedReview | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   // Mock reviews data
-  const reviews = [
+  const reviews: FlaggedReview[] = [
     {
       id: "1",
       productName: "Metamask",
@@ -60,12 +72,12 @@ export function AdminReviews() {
     },
   ];
 
-  const handleViewReview = (review: Review) => {
+  const handleViewReview = (review: FlaggedReview) => {
     setSelectedReview(review);
     setViewDialogOpen(true);
   };
 
-  const handleEditReview = (review: Review) => {
+  const handleEditReview = (review: FlaggedReview) => {
     setSelectedReview(review);
     setEditDialogOpen(true);
   };
@@ -85,9 +97,9 @@ export function AdminReviews() {
       case "inappropriate":
         return "destructive";
       case "spam":
-        return "yellow";
+        return "secondary";
       case "duplicate":
-        return "blue";
+        return "outline";
       default:
         return "secondary";
     }
@@ -153,11 +165,11 @@ export function AdminReviews() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleViewReview(review as Review)}>
+                      <DropdownMenuItem onClick={() => handleViewReview(review)}>
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEditReview(review as Review)}>
+                      <DropdownMenuItem onClick={() => handleEditReview(review)}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit Review
                       </DropdownMenuItem>
