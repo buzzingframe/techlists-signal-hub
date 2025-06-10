@@ -9,7 +9,7 @@ import { ProductErrorBoundary } from "@/components/product/ProductErrorBoundary"
 import { ProductLayout } from "@/components/product/ProductLayout";
 
 export default function ProductDetail() {
-  const { productId } = useParams();
+  const { id: productId } = useParams();
   const { product, isSaved, handleSave, handleReviewSubmitted, isLoading, error } = useProductDetail(productId);
 
   // Determine error message based on error type
