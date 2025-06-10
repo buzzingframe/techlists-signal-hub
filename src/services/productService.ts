@@ -104,7 +104,5 @@ function transformDatabaseProduct(dbProduct: DatabaseProduct): Product {
     price: "Free" as const,
     // TODO: Add proper admin review and other missing fields
     adminReview: null,
-    submissionDate: dbProduct.created_at,
-    lastUpdated: dbProduct.updated_at,
   };
 }
