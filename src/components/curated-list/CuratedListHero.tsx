@@ -19,7 +19,7 @@ export function CuratedListHero({ list, formatDate }: CuratedListHeroProps) {
             className="w-full h-full object-cover mix-blend-overlay"
           />
         </div>
-        <div className="container mx-auto px-4 h-full flex items-end pb-8">
+        <div className="page-container h-full flex items-end pb-8">
           <div className="text-white">
             <h1 className="text-3xl md:text-4xl font-bold">{list.title}</h1>
             <div className="flex items-center mt-2">
@@ -35,7 +35,7 @@ export function CuratedListHero({ list, formatDate }: CuratedListHeroProps) {
   }
 
   return (
-    <div className="mb-6">
+    <div className="page-container section-spacing">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl font-bold">{list.title}</h1>
         {list.isPinned && (
