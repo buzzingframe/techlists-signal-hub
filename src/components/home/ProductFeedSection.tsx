@@ -1,8 +1,9 @@
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGridSkeleton } from "@/components/loading/ProductGridSkeleton";
 import { NetworkError } from "@/components/error/NetworkError";
+import { CategoryNavigation } from "@/components/home/CategoryNavigation";
 import { 
   Select,
   SelectContent,
@@ -20,31 +21,25 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useProducts } from "@/hooks/useProducts";
+import { useProductsFilter } from "@/hooks/useProductsFilter";
 
 const PRODUCTS_PER_PAGE = 9;
 
 export function ProductFeedSection() {
-  const [sortBy, setSortBy] = useState("signalScore");
   const [currentPage, setCurrentPage] = useState(1);
-  const { products, isLoading, error, refetch, isOffline } = useProducts();
-
-  // Memoize sorted products to prevent unnecessary re-renders
-  const sortedProducts = useMemo(() => {
-    if (!products.length) return [];
-    
-    return [...products].sort((a, b) => {
-      switch (sortBy) {
-        case "signalScore":
-          return b.signalScore - a.signalScore;
-        case "alphabetical":
-          return a.name.localeCompare(b.name);
-        case "category":
-          return a.category.localeCompare(b.category);
-        default:
-          return 0;
-      }
-    });
-  }, [products, sortBy]);
+  // Show all products including pending ones for now to address the "no products found" issue
+  const { products, isLoading, error, refetch, isOffline } = useProducts(true);
+  
+  const {
+    categories,
+    selectedCategory,
+    sortBy,
+    sortedProducts,
+    filteredCount,
+    totalProducts,
+    handleCategoryChange,
+    handleSortChange
+  } = useProductsFilter(products);
 
   // Calculate pagination
   const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
@@ -52,9 +47,14 @@ export function ProductFeedSection() {
   const endIndex = startIndex + PRODUCTS_PER_PAGE;
   const displayProducts = sortedProducts.slice(startIndex, endIndex);
 
-  // Reset to page 1 when sorting changes
-  const handleSortChange = (newSortBy: string) => {
-    setSortBy(newSortBy);
+  // Reset to page 1 when filtering changes
+  const handleCategoryChangeWithReset = (category: string) => {
+    handleCategoryChange(category);
+    setCurrentPage(1);
+  };
+
+  const handleSortChangeWithReset = (newSortBy: string) => {
+    handleSortChange(newSortBy);
     setCurrentPage(1);
   };
 
@@ -118,35 +118,51 @@ export function ProductFeedSection() {
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Latest Products</h2>
             <p className="text-muted-foreground text-sm md:text-base">
-              Discover the newest and most promising Web3 tools ({sortedProducts.length} total)
+              Discover the newest and most promising Web3 tools 
+              {selectedCategory === "all" 
+                ? `(${totalProducts} total)` 
+                : `(${filteredCount} in ${selectedCategory})`
+              }
             </p>
           </div>
           
           <div className="flex items-center">
             <span className="mr-2 text-sm text-muted-foreground hidden sm:inline">Sort by:</span>
-            <Select value={sortBy} onValueChange={handleSortChange} disabled={isLoading}>
+            <Select value={sortBy} onValueChange={handleSortChangeWithReset} disabled={isLoading}>
               <SelectTrigger className="w-[140px] sm:w-[180px]">
                 <SelectValue placeholder="Sort by..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="signalScore">Signal Score</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
                 <SelectItem value="alphabetical">A-Z</SelectItem>
                 <SelectItem value="category">Category</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
+
+        {/* Category Navigation */}
+        {!isLoading && categories.length > 0 && (
+          <CategoryNavigation
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChangeWithReset}
+            isLoading={isLoading}
+          />
+        )}
         
         {isLoading ? (
           <ProductGridSkeleton count={9} />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-              {displayProducts.map((product) => (
+              {displayProducts.map((product, index) => (
                 <ProductCard 
                   key={product.id} 
                   product={product} 
                   className="h-full animate-fade-in" 
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 />
               ))}
             </div>
@@ -205,10 +221,24 @@ export function ProductFeedSection() {
           </>
         )}
 
-        {!isLoading && displayProducts.length === 0 && sortedProducts.length === 0 && (
+        {/* Enhanced Empty States */}
+        {!isLoading && displayProducts.length === 0 && (
           <div className="text-center py-12">
-            <h3 className="text-lg font-semibold">No products found</h3>
-            <p className="mt-2 text-muted-foreground">Try adjusting your search criteria.</p>
+            {selectedCategory === "all" ? (
+              <>
+                <h3 className="text-lg font-semibold">No products available</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Products are currently being reviewed. Check back soon for new additions!
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold">No products found in {selectedCategory}</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Try selecting a different category or view all products.
+                </p>
+              </>
+            )}
           </div>
         )}
       </div>

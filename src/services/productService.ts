@@ -21,12 +21,16 @@ export interface DatabaseProduct {
 }
 
 export const productService = {
-  async getAllProducts(): Promise<Product[]> {
-    const { data, error } = await supabase
+  async getAllProducts(includeAllStatuses = false): Promise<Product[]> {
+    let query = supabase
       .from('products')
-      .select('*')
-      .eq('status', 'approved')
-      .order('created_at', { ascending: false });
+      .select('*');
+
+    if (!includeAllStatuses) {
+      query = query.eq('status', 'approved');
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching products:', error);

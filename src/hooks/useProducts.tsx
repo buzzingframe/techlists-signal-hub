@@ -1,16 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@/types/product";
 import { productService } from "@/services/productService";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
-export function useProducts() {
+export function useProducts(includeAllStatuses = false) {
   const { isOnline } = useNetworkStatus();
   
   const { data: products = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['products'],
-    queryFn: productService.getAllProducts,
+    queryKey: ['products', includeAllStatuses],
+    queryFn: () => productService.getAllProducts(includeAllStatuses),
     retry: (failureCount, error) => {
       // Don't retry if offline
       if (!navigator.onLine) return false;
