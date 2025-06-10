@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +19,7 @@ export function RealReviewsManager() {
         .from('reviews')
         .select(`
           *,
-          products:product_id(name)
+          products!reviews_product_id_fkey(name)
         `)
         .in('status', ['needs_moderation', 'flagged'])
         .order('created_at', { ascending: false });

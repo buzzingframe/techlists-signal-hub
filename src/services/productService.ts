@@ -97,7 +97,7 @@ function transformDatabaseProduct(dbProduct: DatabaseProduct): Product {
     logo: dbProduct.logo_url || '',
     signalScore: dbProduct.signal_score || 0,
     badges: dbProduct.badges || [],
-    useCases: dbProduct.use_case || [],
+    useCase: dbProduct.use_case || [],
     pricing: dbProduct.pricing || {},
     features: dbProduct.features || {},
     media: dbProduct.media || {},
