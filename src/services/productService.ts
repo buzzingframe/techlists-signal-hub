@@ -103,8 +103,8 @@ function transformDatabaseProduct(dbProduct: DatabaseProduct): Product {
     badges: dbProduct.badges || [],
     useCase: dbProduct.use_case || [],
     pricing: dbProduct.pricing || {},
-    features: dbProduct.features || {},
-    media: dbProduct.media || {},
+    features: Array.isArray(dbProduct.features) ? dbProduct.features : [],
+    media: Array.isArray(dbProduct.media) ? dbProduct.media : [],
     price: "Free" as const,
     // TODO: Add proper admin review and other missing fields
     adminReview: null,

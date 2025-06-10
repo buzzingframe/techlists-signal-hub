@@ -162,7 +162,6 @@ export function ProductFeedSection() {
                   key={product.id} 
                   product={product} 
                   className="h-full animate-fade-in" 
-                  style={{ animationDelay: `${index * 0.1}s` }}
                 />
               ))}
             </div>

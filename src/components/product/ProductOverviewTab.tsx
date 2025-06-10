@@ -23,13 +23,17 @@ interface ProductOverviewTabProps {
 }
 
 export function ProductOverviewTab({ features = [], media = [] }: ProductOverviewTabProps) {
+  // Ensure media is always an array before processing
+  const safeMedia = Array.isArray(media) ? media : [];
+  const safeFeatures = Array.isArray(features) ? features : [];
+
   // Convert media and features to the required format
-  const formattedMedia = media.map(item => ({
+  const formattedMedia = safeMedia.map(item => ({
     ...item,
     caption: item.caption || `${item.type} content` // Ensure caption is always present
   })) as MediaWithRequiredCaption[];
 
-  const formattedFeatures = features.map(feature => ({
+  const formattedFeatures = safeFeatures.map(feature => ({
     ...feature,
     expanded: feature.expanded || feature.description // Ensure expanded is always present
   })) as FeatureWithRequiredExpanded[];
