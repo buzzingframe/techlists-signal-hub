@@ -69,15 +69,16 @@ const mockNotifications: Notification[] = [
 ];
 
 export function NotificationsDropdown() {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const isMobile = useIsMobile();
   const { user } = useAuth();
   
-  // Don't render notifications for unauthenticated users
+  // Don't render notifications for unauthenticated users - move this check to the very beginning
   if (!user) {
     return null;
   }
+
+  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     const count = notifications.filter(notification => !notification.read).length;
