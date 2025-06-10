@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/home/HeroSection";
 import { ProductFeedSection } from "@/components/home/ProductFeedSection";
 import { NewsPreviewStrip } from "@/components/NewsPreviewStrip";
+import { ProductDetailModal } from "@/components/product/ProductDetailModal";
 
 const Index = () => {
   return (
@@ -20,6 +21,9 @@ const Index = () => {
       <NewsPreviewStrip />
 
       <Footer />
+      
+      {/* Product Detail Modal */}
+      <ProductDetailModal />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
   SheetTrigger 
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock notifications data - in a real app, this would come from an API or database
 const mockNotifications: Notification[] = [
@@ -70,6 +72,12 @@ export function NotificationsDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [unreadCount, setUnreadCount] = useState(0);
   const isMobile = useIsMobile();
+  const { user } = useAuth();
+  
+  // Don't render notifications for unauthenticated users
+  if (!user) {
+    return null;
+  }
   
   useEffect(() => {
     const count = notifications.filter(notification => !notification.read).length;
