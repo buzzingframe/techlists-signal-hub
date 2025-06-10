@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { useRealCuratedListDetail } from "@/hooks/useRealCuratedLists";
 
 export default function CuratedListDetail() {
-  const { listId } = useParams<{ listId: string }>();
-  const { list, products, isLoading, isAdmin } = useRealCuratedListDetail(listId || '');
+  const { id } = useParams<{ id: string }>();
+  const { list, products, isLoading, isAdmin } = useRealCuratedListDetail(id || '');
   
   // Format date to be more readable
   const formatDate = (dateString: string) => {
