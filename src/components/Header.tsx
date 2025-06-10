@@ -3,11 +3,10 @@ import React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/header/Logo";
 import { NavigationItems } from "@/components/header/NavigationItems";
-import { ThemeToggle } from "@/components/header/ThemeToggle";
 import { NotificationsDropdown } from "@/components/notifications/NotificationsDropdown";
 import { MobileMenu } from "@/components/header/MobileMenu";
 import { UserActions } from "@/components/header/UserActions";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export function Header() {
   const { toast } = useToast();
@@ -30,7 +29,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <NotificationsDropdown />
           {!isMobile && <UserActions />}
           {isMobile && <MobileMenu onLogin={handleLogin} />}
