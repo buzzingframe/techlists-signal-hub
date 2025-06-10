@@ -27,7 +27,7 @@ export default function CuratedListDetail() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-8">
+        <main className="flex-1 page-container section-spacing">
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold">Loading...</h2>
             <p className="mt-2 text-muted-foreground">Please wait while we load the curated list.</p>
@@ -42,7 +42,7 @@ export default function CuratedListDetail() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-8">
+        <main className="flex-1 page-container section-spacing">
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold">List not found</h2>
             <p className="mt-2 text-muted-foreground">The requested curated list could not be found.</p>
@@ -64,9 +64,9 @@ export default function CuratedListDetail() {
         {/* Hero section */}
         <CuratedListHero list={list} formatDate={formatDate} />
         
-        <div className="container mx-auto px-4 py-8">
+        <div className="page-container section-spacing content-spacing">
           {/* Description */}
-          <div className="mb-8">
+          <div className="card-spacing">
             <p className="text-lg md:text-xl">{list.description}</p>
             <div className="flex items-center mt-4 text-sm text-muted-foreground">
               <span>Curated by {list.createdBy}</span>

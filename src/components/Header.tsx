@@ -23,17 +23,15 @@ export function Header() {
 
   return (
     <header className="border-b">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="page-container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Logo />
-
           {!isMobile && <NavigationItems />}
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <NotificationsDropdown />
-
           {!isMobile && <UserActions />}
           {isMobile && <MobileMenu onLogin={handleLogin} />}
         </div>

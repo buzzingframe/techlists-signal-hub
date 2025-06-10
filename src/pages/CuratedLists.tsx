@@ -14,7 +14,7 @@ export default function CuratedLists() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1">
-          <div className="container mx-auto px-4 py-8">
+          <div className="page-container section-spacing">
             <div className="text-center py-12">
               <h2 className="text-2xl font-bold text-destructive">Failed to load curated lists</h2>
               <p className="mt-2 text-muted-foreground">Please try refreshing the page.</p>
@@ -31,11 +31,11 @@ export default function CuratedLists() {
       <Header />
       
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-6 md:py-8">
+        <div className="page-container section-spacing content-spacing">
           <CuratedListHeader isAdmin={isAdmin} />
           
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-standard">
               {Array.from({ length: 6 }).map((_, index) => (
                 <CuratedListSkeleton key={index} />
               ))}

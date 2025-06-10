@@ -64,8 +64,8 @@ export function NewsPreviewStrip() {
   };
 
   return (
-    <section className="py-12 bg-muted/20">
-      <div className="container mx-auto px-4">
+    <section className="section-spacing bg-muted/20">
+      <div className="page-container">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold">Latest Insights</h2>
@@ -75,7 +75,7 @@ export function NewsPreviewStrip() {
         </div>
 
         <ScrollArea className="w-full">
-          <div className="flex gap-6 pb-4">
+          <div className="flex grid-standard pb-4">
             {newsItems.map((item) => {
               const tagInfo = NEWS_TAGS.find(tag => tag.value === item.tag) || NEWS_TAGS[0];
               
@@ -85,7 +85,7 @@ export function NewsPreviewStrip() {
                   className="group min-w-[300px] max-w-[300px] hover:shadow-md transition-all duration-200 hover:-translate-y-1 cursor-pointer"
                   onClick={() => handleNavigateToArticle(item.slug)}
                 >
-                  <CardContent className="p-6">
+                  <CardContent className="card-padding">
                     <div className="flex items-center justify-between mb-3">
                       <Badge 
                         variant="secondary" 

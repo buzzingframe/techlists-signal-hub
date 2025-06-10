@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Edit, MoveVertical, Plus, Trash2, Pin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -56,7 +55,7 @@ export function CuratedListAdminControls({ list, isAdmin }: CuratedListAdminCont
   };
 
   return (
-    <div className="bg-muted/50 border rounded-lg p-4 mb-8">
+    <div className="bg-muted/50 border rounded-lg card-padding">
       <h2 className="font-medium mb-3">Admin Controls</h2>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" className="flex items-center gap-1" onClick={handleEditDetails}>

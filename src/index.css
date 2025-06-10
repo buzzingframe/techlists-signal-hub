@@ -115,4 +115,33 @@
   .dark .backdrop-blur-glass {
     background: rgba(0, 0, 0, 0.8);
   }
+
+  /* Standard Layout Classes */
+  .page-container {
+    @apply container mx-auto px-4;
+  }
+  
+  .section-spacing {
+    @apply py-12;
+  }
+  
+  .section-spacing-lg {
+    @apply py-16;
+  }
+  
+  .content-spacing {
+    @apply space-y-8;
+  }
+  
+  .grid-standard {
+    @apply gap-6;
+  }
+  
+  .card-padding {
+    @apply p-6;
+  }
+  
+  .card-spacing {
+    @apply space-y-4;
+  }
 }

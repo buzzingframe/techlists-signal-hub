@@ -37,7 +37,7 @@ export function CuratedListCard({ list }: CuratedListCardProps) {
         </div>
       )}
       
-      <CardHeader>
+      <CardHeader className="card-padding">
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl">{list.title}</CardTitle>
@@ -54,7 +54,7 @@ export function CuratedListCard({ list }: CuratedListCardProps) {
         <CardDescription className="mt-2">{list.description}</CardDescription>
       </CardHeader>
       
-      <CardContent className="flex-1">
+      <CardContent className="flex-1 card-padding pt-0">
         <div className="flex flex-wrap gap-2 mt-2">
           {list.tags.map((tag) => (
             <Badge key={tag} variant="secondary">{tag}</Badge>
@@ -62,7 +62,7 @@ export function CuratedListCard({ list }: CuratedListCardProps) {
         </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between pt-2">
+      <CardFooter className="flex justify-between card-padding pt-0">
         <div className="text-sm text-muted-foreground">
           {list.productIds.length} products
         </div>
