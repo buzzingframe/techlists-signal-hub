@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { curatedListService } from "@/services/curatedListService";
 import { productService } from "@/services/productService";
+import { useIsAdmin } from "@/hooks/useAuth";
 
 export function useRealCuratedLists() {
   const { data: lists = [], isLoading, error } = useQuery({
@@ -9,8 +10,7 @@ export function useRealCuratedLists() {
     queryFn: curatedListService.getAllLists,
   });
 
-  // TODO: Replace with actual admin check from auth
-  const isAdmin = true;
+  const { isAdmin } = useIsAdmin();
 
   return { lists, isLoading, error, isAdmin };
 }
@@ -35,9 +35,7 @@ export function useRealCuratedListDetail(listId: string) {
   });
 
   const isLoading = listLoading || productIdsLoading || productsLoading;
-
-  // TODO: Replace with actual admin check from auth
-  const isAdmin = true;
+  const { isAdmin } = useIsAdmin();
 
   return { 
     list: list ? { ...list, productIds } : null, 
